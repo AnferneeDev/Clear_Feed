@@ -1,0 +1,48 @@
+# -------------------------
+# Dependencies
+# -------------------------
+node_modules/
+web/node_modules/
+server/node_modules/
+
+# -------------------------
+# Build output
+# -------------------------
+.next/
+web/.next/
+server/.next/
+out/
+build/
+dist/
+
+# -------------------------
+# Environment files
+# -------------------------
+.env
+.env.*
+!.env.example   # keep a safe example if you want
+
+# -------------------------
+# Logs & debug
+# -------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# -------------------------
+# OS / Editor junk
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.pem
+
+# -------------------------
+# Framework / Hosting
+# -------------------------
+.vercel/
