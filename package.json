@@ -4,5 +4,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2"
   }
 }

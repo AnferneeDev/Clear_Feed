@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { Redis } from '@upstash/redis';
 
 // Explicitly read environment variables to make debugging easier.
 // This is the most common point of failure.
@@ -7,7 +7,9 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 // If the credentials are not found, throw a clear error immediately.
 if (!redisUrl || !redisToken) {
-  throw new Error("Missing Upstash Redis credentials. Please check your .env.local file and restart your server.");
+  throw new Error(
+    'Missing Upstash Redis credentials. Please check your .env.local file and restart your server.'
+  );
 }
 
 // Initialize the Redis client with the explicit credentials.
