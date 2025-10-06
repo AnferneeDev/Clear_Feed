@@ -46,8 +46,8 @@ async function get(key) {
  */
 async function set(key, data) {
   try {
-    // 'ex' sets the expiration time in seconds.
-    await redis.set(key, data, { ex: CACHE_DURATION_SECONDS });
+    // 'ex' sets the expiration time in seconds. if not set then the key will not expire.
+    await redis.set(key, data);
   } catch (error) {
     console.error(`Redis SET error for key "${key}":`, error.message);
     // Fail gracefully on set as well. The app can function without the cache.
