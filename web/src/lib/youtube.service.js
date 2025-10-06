@@ -1,55 +1,54 @@
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3";
+// This class is responsible for all communication with the YouTube Data API.
+export class YouTubeService {
+  static YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+  static BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
-/**
- * Finds a YouTube channel by its handle or ID.
- * @param {string} identifier - The channel's handle (e.g., "@MKBHD") or ID.
- * @returns {Promise<{channelId: string, channelInfo: object}>}
- */
-async function findChannel(identifier) {
-  let channelId = identifier;
-  let channelInfo = null;
+  /**
+   * Finds a YouTube channel's ID and basic info from a handle or custom URL.
+   * @param {string} id - The channel handle (e.g., "@MKBHD") or custom URL name.
+   * @returns {Promise<{channelId: string, channelInfo: object}>}
+   */
+  static async findChannel(id) {
+    const searchUrl = `${this.BASE_URL}/search?part=snippet&q=${id}&type=channel&key=${this.YOUTUBE_API_KEY}`;
+    const response = await fetch(searchUrl);
+    const data = await response.json();
 
-  // If the identifier starts with '@', it's a handle. We need to find its ID.
-  if (identifier.startsWith("@")) {
-    const handle = identifier.substring(1);
-    const searchUrl = `${YOUTUBE_API_URL}/search?part=snippet&q=${handle}&type=channel&key=${YOUTUBE_API_KEY}`;
-    const searchResponse = await fetch(searchUrl);
-    const searchData = await searchResponse.json();
+    const channel = data.items?.[0];
 
-    if (!searchData.items || searchData.items.length === 0) {
-      throw new Error("Channel not found.");
+    if (!channel) {
+      throw new Error('Channel not found.');
     }
-    channelId = searchData.items[0].snippet.channelId;
-    channelInfo = searchData.items[0].snippet;
-  } else {
-    // If it's not a handle, assume it's an ID and fetch its data.
-    const channelUrl = `${YOUTUBE_API_URL}/channels?part=snippet&id=${channelId}&key=${YOUTUBE_API_KEY}`;
-    const channelResponse = await fetch(channelUrl);
-    const channelData = await channelResponse.json();
 
-    if (!channelData.items || channelData.items.length === 0) {
-      throw new Error("Channel not found.");
-    }
-    channelInfo = channelData.items[0].snippet;
+    const channelInfo = {
+      title: channel.snippet.title,
+      thumbnail: channel.snippet.thumbnails.high.url,
+    };
+
+    // --- THE FIX IS HERE ---
+    // We must return the final object.
+    return {
+      channelId: channel.id.channelId,
+      channelInfo,
+    };
   }
 
-  return { channelId, channelInfo };
-}
+  /**
+   * Gets the 50 most recent video uploads for a given channel ID.
+   * @param {string} channelId - The unique ID of the YouTube channel (e.g., "UCBJycsmduvYEL83R_U4JriQ").
+   * @returns {Promise<Array<object>>} - A list of video objects.
+   */
+  static async getVideosForChannel(channelId) {
+    const searchUrl = `${this.BASE_URL}/search?part=snippet&channelId=${channelId}&maxResults=50&order=date&type=video&key=${this.YOUTUBE_API_KEY}`;
+    const response = await fetch(searchUrl);
+    const data = await response.json();
 
-/**
- * Gets the 50 most recent video uploads for a given channel ID.
- * @param {string} channelId - The ID of the channel.
- * @returns {Promise<Array<object>>} - A list of video objects.
- */
-async function getVideosForChannel(channelId) {
-  const videoSearchUrl = `${YOUTUBE_API_URL}/search?part=snippet&channelId=${channelId}&order=date&type=video&maxResults=50&key=${YOUTUBE_API_KEY}`;
-  const videoResponse = await fetch(videoSearchUrl);
-  const videoData = await videoResponse.json();
-  return videoData.items || [];
-}
+    const videos = data.items.map((item) => ({
+      id: item.id.videoId,
+      title: item.snippet.title,
+      thumbnail: item.snippet.thumbnails.high.url,
+      publishedAt: item.snippet.publishedAt,
+    }));
 
-export const YouTubeService = {
-  findChannel,
-  getVideosForChannel,
-};
+    return videos;
+  }
+}

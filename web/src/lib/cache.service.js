@@ -1,57 +1,62 @@
 import { Redis } from '@upstash/redis';
 
-// Explicitly read environment variables to make debugging easier.
-// This is the most common point of failure.
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+// This is the error message that will be thrown if the Redis credentials are not found.
+const CREDENTIALS_ERROR_MESSAGE =
+  'Missing Upstash Redis credentials. Please check your .env.local file and restart your server.';
 
-// If the credentials are not found, throw a clear error immediately.
-if (!redisUrl || !redisToken) {
-  throw new Error(
-    'Missing Upstash Redis credentials. Please check your .env.local file and restart your server.'
-  );
-}
+// This class is a wrapper around the Upstash Redis client.
+// It provides a simple get/set interface and handles errors gracefully.
+class CacheService {
+  constructor() {
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-// Initialize the Redis client with the explicit credentials.
-const redis = new Redis({
-  url: redisUrl,
-  token: redisToken,
-});
+    // If the credentials are not found, throw a clear error immediately.
+    if (!redisUrl || !redisToken) {
+      throw new Error(CREDENTIALS_ERROR_MESSAGE);
+    }
 
-// Cache duration in seconds (Redis uses seconds for expiration)
-// 10 minutes = 600 seconds
-const CACHE_DURATION_SECONDS = 10 * 60;
+    this.redis = new Redis({
+      url: redisUrl,
+      token: redisToken,
+    });
+  }
 
-/**
- * Gets a value from the Redis cache. Returns null if not found.
- * @param {string} key The key to look up.
- * @returns {Promise<any | null>} The cached data or null.
- */
-async function get(key) {
-  try {
-    const data = await redis.get(key);
-    return data;
-  } catch (error) {
-    console.error(`Redis GET error for key "${key}":`, error.message);
-    // In case of a Redis error, fail gracefully by returning null.
-    // This allows the app to proceed by fetching fresh data from the API.
-    return null;
+  /**
+   * Retrieves a value from the cache for a given key.
+   * @param {string} key - The key to look up in the cache.
+   * @returns {Promise<any | null>} The cached value, or null if not found or an error occurs.
+   */
+  async get(key) {
+    try {
+      console.log(`REDIS GET for key: ${key}`);
+      const data = await this.redis.get(key);
+      return data;
+    } catch (error) {
+      console.error('Redis GET error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Stores a value in the cache with a predefined expiration time.
+   * @param {string} key - The key to store the value under.
+   * @param {any} value - The value to be stored.
+   */
+  async set(key, value) {
+    try {
+      const CACHE_DURATION_SECONDS = 10 * 60; // 10 minutes
+
+      // --- THE FIX IS HERE ---
+      // We must pass the expiration time as the third argument in an options object.
+      await this.redis.set(key, value, { ex: CACHE_DURATION_SECONDS });
+
+      console.log(`CACHE SET for key: ${key}`);
+    } catch (error) {
+      console.error('Redis SET error:', error);
+    }
   }
 }
 
-/**
- * Sets a value in the Redis cache with an expiration time.
- * @param {string} key The key to store the data under.
- * @param {any} data The data to store.
- */
-async function set(key, data) {
-  try {
-    // 'ex' sets the expiration time in seconds. if not set then the key will not expire.
-    await redis.set(key, data);
-  } catch (error) {
-    console.error(`Redis SET error for key "${key}":`, error.message);
-    // Fail gracefully on set as well. The app can function without the cache.
-  }
-}
-
-export const cacheService = { get, set };
+// Export a singleton instance so the whole app shares one cache connection.
+export const cacheService = new CacheService();
