@@ -1,17 +1,18 @@
 'use client';
 
-import Header from './Header';
-import Sidebar from './Sidebar';
+import AppSidebar from './Sidebar';
+import { SidebarInset } from '@/components/ui/sidebar';
+import Header from './Header'; // <-- UPDATED: Changed to a named import
 
-// This component orchestrates the entire YouTube-like layout
+// This component now orchestrates the layout using the shadcn sidebar pattern
 export default function AppLayout({ children, channelData }) {
   return (
-    <div className="flex flex-col h-screen bg-[var(--neuter)] text-[var(--secundarius)]">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar channelData={channelData} />
+    <>
+      <AppSidebar channelData={channelData} />
+      <SidebarInset>
+        <Header />
         <main className="flex-1 overflow-y-auto">{children}</main>
-      </div>
-    </div>
+      </SidebarInset>
+    </>
   );
 }

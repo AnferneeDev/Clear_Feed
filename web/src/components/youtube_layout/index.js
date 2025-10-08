@@ -1,5 +1,3 @@
-import AppLayout from './AppLayout';
-import Header from './Header';
-import Sidebar from './Sidebar';
-
-export { AppLayout, Header, Sidebar };
+export { default as Header } from './Header';
+export { default as AppLayout } from './AppLayout';
+export { default as Sidebar } from './Sidebar';
