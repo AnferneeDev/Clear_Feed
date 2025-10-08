@@ -1,0 +1,29 @@
+[33mcommit fc4e1a7407c2cfef8135cff89cdc2410071fcfa4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: AnferneeDev <anfernee.developer@gmail.com>
+Date:   Mon Oct 6 18:01:59 2025 -0400
+
+    refactor design and logo lading page
+
+[33mcommit d04e161192330dd6370edde8837d1f444613dea9[m
+Author: AnferneeDev <anfernee.developer@gmail.com>
+Date:   Mon Oct 6 11:40:12 2025 -0400
+
+    refactor: landing page
+
+[33mcommit abdafd9472853fbccf4d3297a54ec2f8105cf951[m
+Author: AnferneeDev <anfernee.developer@gmail.com>
+Date:   Mon Oct 6 10:52:59 2025 -0400
+
+    add: configure sentry
+
+[33mcommit 0d2fec235c37fbb4bb364ed26ade973fdf13ea0c[m
+Author: AnferneeDev <anfernee.developer@gmail.com>
+Date:   Mon Oct 6 08:32:41 2025 -0400
+
+    feat: install prettier and configure eslint
+
+[33mcommit 48d2ce068afbfb214d6dd955aa33ec61f8151cf0[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: AnferneeDev <anfernee.developer@gmail.com>
+Date:   Mon Oct 6 07:54:02 2025 -0400
+
+    Apply clean .gitignore and reset tracked files

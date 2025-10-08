@@ -32,6 +32,11 @@ pnpm-debug.log*
 *.tsbuildinfo
 
 # -------------------------
+# Sentry
+# -------------------------
+.env.sentry-build-plugin
+
+# -------------------------
 # OS / Editor junk
 # -------------------------
 .DS_Store
