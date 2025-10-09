@@ -10,7 +10,6 @@ export async function POST(request) {
 
   // FIXED: await auth() in App Router
   const { userId } = await auth();
-  console.log('userId:', userId);
 
   if (!userId) {
     return new Response('Unauthorized', { status: 401 });

@@ -1,19 +1,20 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware } from '@clerk/nextjs/server';
 
-// Define which routes are protected and require a signed-in user
-const isProtectedRoute = createRouteMatcher([
-  '/api/history(.*)', // Protect our new history API route
-]);
-
-export default clerkMiddleware((auth, req) => {
-  // For protected routes, enforce authentication if the user is not signed in
-  if (isProtectedRoute(req)) {
-    auth.protect(); // CORRECTED: No parentheses on auth
-  }
+export default clerkMiddleware({
+  // By default, all routes are protected.
+  // We list the routes that should be accessible to everyone (public).
+  publicRoutes: [
+    '/',
+    '/channel/(.*)', // Allow all individual channel pages
+    '/api/channel(.*)', // Allow the public API for fetching channel data
+  ],
 });
 
 export const config = {
-  // The following matcher runs middleware on all routes
-  // except static assets.
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };

@@ -58,6 +58,24 @@ export default function AppSidebar() {
               <SidebarSeparator />
               <SidebarGroup>
                 <SidebarGroupLabel className="data-[state=collapsed]:hidden">
+                  My feed
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <Link href="/feed" className="w-full">
+                          <span className="data-[state=collapsed]:hidden truncate">
+                            Feed
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+              <SidebarGroup>
+                <SidebarGroupLabel className="data-[state=collapsed]:hidden">
                   Recent
                 </SidebarGroupLabel>
                 <SidebarGroupContent className={'mr-8'}>
