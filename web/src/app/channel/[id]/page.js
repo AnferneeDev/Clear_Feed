@@ -1,7 +1,7 @@
 // src/app/channel/[id]/page.js
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
@@ -27,39 +27,54 @@ export default function ChannelPage() {
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Track if we've saved history for this channel
+  const historySavedRef = useRef(null);
+
   useEffect(() => {
-    if (id) {
-      setIsLoading(true);
-      setError(null);
-      setChannelData(null);
-      setNextPageToken(null);
+    if (!id) return;
 
-      const fetchChannelData = async () => {
-        try {
-          const response = await fetch(
-            `/api/channel?id=${decodeURIComponent(id)}`
-          );
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `Error: ${response.status}`);
-          }
-          const data = await response.json();
-          setChannelData(data);
-          setNextPageToken(data.nextPageToken);
+    setIsLoading(true);
+    setError(null);
+    setChannelData(null);
+    setNextPageToken(null);
 
-          // --- OPTIMIZED: Save to history immediately ---
-          if (user && data.channelInfo) {
-            saveToHistory(data.channelInfo);
-          }
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
+    const fetchChannelData = async () => {
+      try {
+        console.log('🔍 Fetching channel data for:', id);
+        const response = await fetch(
+          `/api/channel?id=${decodeURIComponent(id)}`
+        );
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Error: ${response.status}`);
         }
-      };
-      fetchChannelData();
+        const data = await response.json();
+        setChannelData(data);
+        setNextPageToken(data.nextPageToken);
+
+        // Save to history after data loads
+        // Note: This happens in a separate effect below
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchChannelData();
+  }, [id]); // REMOVED user from dependencies!
+
+  // Separate effect for saving history
+  useEffect(() => {
+    // Only save if:
+    // 1. We have channel data
+    // 2. User is logged in
+    // 3. We haven't already saved this channel
+    if (channelData?.channelInfo && user && historySavedRef.current !== id) {
+      historySavedRef.current = id;
+      saveToHistory(channelData.channelInfo);
     }
-  }, [id, user]);
+  }, [channelData, user, id]);
 
   // Separate function for saving history
   const saveToHistory = async (channelInfo) => {
