@@ -37,7 +37,7 @@ export async function POST(request) {
     );
 
     const updatedHistory = [newChannel, ...filteredHistory];
-    const finalHistory = updatedHistory.slice(0, 3);
+    const finalHistory = updatedHistory.slice(0, 5);
 
     // FIXED: await clerkClient() call here too
     await client.users.updateUserMetadata(userId, {

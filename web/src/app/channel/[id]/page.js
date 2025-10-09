@@ -1,10 +1,10 @@
-// src/app/channel/[id]/page.js
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
+import { saveChannelToHistory } from '@/lib/user.service';
 import {
   LoadingSpinner,
   ErrorDisplay,
@@ -14,6 +14,22 @@ import {
 
 import { AppLayout } from '@/components/youtube_layout/index';
 import ShimmerButton from '@/components/magicui/shimmer-button';
+
+function formatDuration(durationSeconds) {
+  if (durationSeconds == null || durationSeconds === 0) return '0:00';
+  const hours = Math.floor(durationSeconds / 3600);
+  const minutes = Math.floor((durationSeconds % 3600) / 60);
+  const seconds = durationSeconds % 60;
+
+  const paddedSeconds = seconds.toString().padStart(2, '0');
+  const paddedMinutes = minutes.toString().padStart(2, '0');
+
+  if (hours > 0) {
+    return `${hours}:${paddedMinutes}:${paddedSeconds}`;
+  } else {
+    return `${minutes}:${paddedSeconds}`;
+  }
+}
 
 export default function ChannelPage() {
   const { user } = useUser();
@@ -26,9 +42,7 @@ export default function ChannelPage() {
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  // Track if we've saved history for this channel
-  const historySavedRef = useRef(null);
+  const historySavedRef = useRef(false);
 
   useEffect(() => {
     if (!id) return;
@@ -37,10 +51,10 @@ export default function ChannelPage() {
     setError(null);
     setChannelData(null);
     setNextPageToken(null);
+    historySavedRef.current = false; // Reset flag on new channel navigation
 
     const fetchChannelData = async () => {
       try {
-        console.log('🔍 Fetching channel data for:', id);
         const response = await fetch(
           `/api/channel?id=${decodeURIComponent(id)}`
         );
@@ -51,9 +65,6 @@ export default function ChannelPage() {
         const data = await response.json();
         setChannelData(data);
         setNextPageToken(data.nextPageToken);
-
-        // Save to history after data loads
-        // Note: This happens in a separate effect below
       } catch (err) {
         setError(err.message);
       } finally {
@@ -62,52 +73,22 @@ export default function ChannelPage() {
     };
 
     fetchChannelData();
-  }, [id]); // REMOVED user from dependencies!
+  }, [id]);
 
   // Separate effect for saving history
   useEffect(() => {
-    // Only save if:
-    // 1. We have channel data
-    // 2. User is logged in
-    // 3. We haven't already saved this channel
-    if (channelData?.channelInfo && user && historySavedRef.current !== id) {
-      historySavedRef.current = id;
-      saveToHistory(channelData.channelInfo);
+    if (user && channelData?.channelInfo && !historySavedRef.current) {
+      historySavedRef.current = true;
+      saveChannelToHistory(
+        {
+          id: id,
+          title: channelData.channelInfo.title,
+          thumbnail: channelData.channelInfo.thumbnail,
+        },
+        user
+      );
     }
   }, [channelData, user, id]);
-
-  // Separate function for saving history
-  const saveToHistory = async (channelInfo) => {
-    try {
-      console.log('💾 Saving to history:', channelInfo.title);
-
-      const historyResponse = await fetch('/api/history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: id,
-          title: channelInfo.title,
-          thumbnail: channelInfo.thumbnail,
-        }),
-        cache: 'no-store',
-      });
-
-      if (historyResponse.ok) {
-        console.log('✅ History saved successfully');
-
-        // Force immediate reload of user data
-        if (user?.reload) {
-          await user.reload();
-          console.log('✅ User data reloaded');
-        }
-      } else {
-        const errorText = await historyResponse.text();
-        console.error('❌ Failed to save history:', errorText);
-      }
-    } catch (err) {
-      console.error('❌ Error saving history:', err);
-    }
-  };
 
   const handleLoadMore = async () => {
     if (!nextPageToken || isLoadingMore) return;
@@ -195,6 +176,9 @@ export default function ChannelPage() {
                       objectFit="cover"
                       className="transform group-hover:scale-105 transition-transform duration-300"
                     />
+                    <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-semibold px-2 py-1 rounded">
+                      {formatDuration(video.durationSeconds)}
+                    </span>
                   </div>
                   <div className="mt-3">
                     <h3 className="font-semibold text-base text-[var(--secundarius)] leading-tight truncate group-hover:text-[var(--primarius)] transition-colors">
