@@ -1,10 +1,10 @@
+// src/app/channel/[id]/page.js
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
-
-// --- Your clean imports, respected ---
 import {
   LoadingSpinner,
   ErrorDisplay,
@@ -13,9 +13,10 @@ import {
 } from '@/components/channel_id/index';
 
 import { AppLayout } from '@/components/youtube_layout/index';
+import ShimmerButton from '@/components/magicui/shimmer-button';
 
-// --- Main Channel Page Component ---
 export default function ChannelPage() {
+  const { user } = useUser();
   const params = useParams();
   const id = params.id;
 
@@ -23,12 +24,15 @@ export default function ChannelPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     if (id) {
       setIsLoading(true);
       setError(null);
       setChannelData(null);
+      setNextPageToken(null);
 
       const fetchChannelData = async () => {
         try {
@@ -41,6 +45,12 @@ export default function ChannelPage() {
           }
           const data = await response.json();
           setChannelData(data);
+          setNextPageToken(data.nextPageToken);
+
+          // --- OPTIMIZED: Save to history immediately ---
+          if (user && data.channelInfo) {
+            saveToHistory(data.channelInfo);
+          }
         } catch (err) {
           setError(err.message);
         } finally {
@@ -49,7 +59,64 @@ export default function ChannelPage() {
       };
       fetchChannelData();
     }
-  }, [id]);
+  }, [id, user]);
+
+  // Separate function for saving history
+  const saveToHistory = async (channelInfo) => {
+    try {
+      console.log('💾 Saving to history:', channelInfo.title);
+
+      const historyResponse = await fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: id,
+          title: channelInfo.title,
+          thumbnail: channelInfo.thumbnail,
+        }),
+        cache: 'no-store',
+      });
+
+      if (historyResponse.ok) {
+        console.log('✅ History saved successfully');
+
+        // Force immediate reload of user data
+        if (user?.reload) {
+          await user.reload();
+          console.log('✅ User data reloaded');
+        }
+      } else {
+        const errorText = await historyResponse.text();
+        console.error('❌ Failed to save history:', errorText);
+      }
+    } catch (err) {
+      console.error('❌ Error saving history:', err);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (!nextPageToken || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const response = await fetch(
+        `/api/channel?id=${decodeURIComponent(id)}&pageToken=${nextPageToken}`
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+      const data = await response.json();
+      setChannelData((prevData) => ({
+        ...prevData,
+        videos: [...prevData.videos, ...data.videos],
+      }));
+      setNextPageToken(data.nextPageToken);
+    } catch (err) {
+      console.error('Failed to load more videos:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const renderMainContent = () => {
     if (isLoading)
@@ -64,29 +131,16 @@ export default function ChannelPage() {
           <ErrorDisplay message={error} />
         </div>
       );
-    if (channelData && channelData.videos.length === 0)
+    if (channelData && channelData.videos.length === 0) {
       return (
         <div className="p-8">
           <EmptyState channelInfo={channelData.channelInfo} />
         </div>
       );
+    }
     if (channelData) {
       return (
         <div>
-          {/* Channel Banner */}
-          {channelData.channelInfo.banner && (
-            <div className="relative h-32 md:h-48 w-full">
-              <Image
-                src={channelData.channelInfo.banner}
-                alt={`${channelData.channelInfo.title} banner`}
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            </div>
-          )}
-
-          {/* Channel Info Header */}
           <div className="p-4 md:p-8">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">
               <Image
@@ -111,9 +165,7 @@ export default function ChannelPage() {
                 </p>
               </div>
             </div>
-
-            {/* Video Grid - Now wider */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
               {channelData.videos.map((video) => (
                 <div
                   key={video.id}
@@ -139,6 +191,22 @@ export default function ChannelPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="mt-12 flex justify-center">
+              {isLoadingMore ? (
+                <LoadingSpinner />
+              ) : (
+                nextPageToken && (
+                  <ShimmerButton
+                    className="shadow-2xl"
+                    onClick={handleLoadMore}
+                  >
+                    <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                      Load More
+                    </span>
+                  </ShimmerButton>
+                )
+              )}
             </div>
           </div>
         </div>

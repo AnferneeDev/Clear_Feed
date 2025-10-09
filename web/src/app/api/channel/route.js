@@ -1,19 +1,27 @@
-import { NextResponse } from "next/server";
-import { YouTubeService } from "@/lib/youtube.service";
-import { cacheService } from "@/lib/cache.service"; // Use the Redis cache service
+import { NextResponse } from 'next/server';
+import { YouTubeService } from '@/lib/youtube.service';
+import { cacheService } from '@/lib/cache.service';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const id = searchParams.get('id');
+  // --- UPDATED: Get the pageToken from the request URL ---
+  const pageToken = searchParams.get('pageToken');
 
   if (!id) {
-    return NextResponse.json({ message: "Channel identifier is required." }, { status: 400 });
+    return NextResponse.json(
+      { message: 'Channel identifier is required.' },
+      { status: 400 }
+    );
   }
 
-  const cacheKey = `channel:${id}`;
+  // --- UPDATED: Make the cache key unique for each page ---
+  let cacheKey = `channel:${id}`;
+  if (pageToken) {
+    cacheKey += `:${pageToken}`;
+  }
 
   try {
-    // 1. Check the Redis cache first
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       console.log(`CACHE HIT for key: ${cacheKey}`);
@@ -21,19 +29,16 @@ export async function GET(request) {
     }
     console.log(`CACHE MISS for key: ${cacheKey}`);
 
-    // 2. If not in cache, call the YouTube Service
-    const { channelId, channelInfo } = await YouTubeService.findChannel(id);
-    const videos = await YouTubeService.getVideosForChannel(channelId);
+    // --- UPDATED: Pass the pageToken to the service call ---
+    const responseData = await YouTubeService.getChannelData(id, pageToken);
 
-    const responseData = { channelInfo, videos };
-
-    // 3. Store the fresh data in the Redis cache for next time
-    // We use a "fire-and-forget" approach for the cache set operation
     cacheService.set(cacheKey, responseData).catch(console.error);
-
     return NextResponse.json(responseData);
   } catch (error) {
-    console.error("API Route Error:", error.message);
-    return NextResponse.json({ message: error.message }, { status: error.message.includes("not found") ? 404 : 500 });
+    console.error('API Route Error:', error.message);
+    return NextResponse.json(
+      { message: error.message },
+      { status: error.message.includes('not found') ? 404 : 500 }
+    );
   }
 }
