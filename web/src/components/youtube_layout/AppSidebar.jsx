@@ -17,7 +17,6 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { Rss } from 'lucide-react'; // --- ADDED: Icon for the feed link ---
 
 export default function AppSidebar() {
   const { user } = useUser();
@@ -32,10 +31,11 @@ export default function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="flex items-center gap-2">
-                  {/* --- CHANGE 1: Increased trigger size --- */}
-                  <SidebarTrigger className={'w-11 h-11'} />
+                  {/* --- SidebarTrigger with hamburger icon --- */}
+                  <SidebarTrigger className="w-11 h-11 flex items-center justify-center"></SidebarTrigger>
+
                   <SidebarMenuButton asChild>
-                    <Link href="/" className="flex items-center gap-2">
+                    <Link href="/feed" className="flex items-center gap-2">
                       <Image
                         src="/clear_feed.png"
                         alt="Clear Feed logo"
@@ -57,31 +57,6 @@ export default function AppSidebar() {
         <SignedIn>
           {/* --- CHANGE 2: Added a separator --- */}
           <SidebarSeparator />
-
-          {/* "My Feed" Group */}
-          <SidebarGroup>
-            <SidebarGroupLabel className="data-[state=collapsed]:hidden">
-              My feed
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      href="/feed"
-                      className="w-full flex items-center gap-3"
-                    >
-                      {/* --- CHANGE 3: Added an icon for the feed --- */}
-                      <Rss className="h-5 w-5 flex-shrink-0" />
-                      <span className="data-[state=collapsed]:hidden truncate">
-                        Feed
-                      </span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
 
           {/* --- CHANGE 4: Added a new, empty "Following" group --- */}
           <SidebarGroup>

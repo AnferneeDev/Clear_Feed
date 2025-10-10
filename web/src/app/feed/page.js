@@ -1,7 +1,6 @@
-// src/app/feed/page.js
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { AppLayout } from '@/components/youtube_layout/index';
 import {
@@ -9,7 +8,7 @@ import {
   LoadingSpinner,
   ErrorDisplay,
 } from '@/components/channel_id/index';
-import { FeedVideoCard } from '@/components/channel_view/index';
+import { FeedVideoCard, FilterControls } from '@/components/channel_view/index';
 import Link from 'next/link';
 
 function FeedGrid({ videos, onVideoSelect }) {
@@ -52,26 +51,24 @@ function FeedEmptyState({ isSignedIn }) {
 }
 
 export default function FeedPage() {
-  // --- UPDATED: Get isLoaded and isSignedIn from useUser ---
   const { isLoaded, isSignedIn } = useUser();
   const [feedVideos, setFeedVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
 
-  // --- UPDATED: useEffect now waits for Clerk to be loaded ---
+  const [sortBy, setSortBy] = useState('newest');
+  const [durationRange, setDurationRange] = useState([2, 60]);
+
   useEffect(() => {
-    // Don't do anything until Clerk has loaded the user session
     if (!isLoaded) {
       return;
     }
-
     setIsLoading(true);
     setError(null);
-
     const fetchFeed = async () => {
       try {
-        const response = await fetch('/api/feed', { credentials: 'include' });
+        const response = await fetch('/api/feed');
         if (!response.ok) {
           throw new Error('Failed to fetch feed.');
         }
@@ -83,9 +80,32 @@ export default function FeedPage() {
         setIsLoading(false);
       }
     };
-
     fetchFeed();
-  }, [isLoaded, isSignedIn]); // --- UPDATED: Depend on isLoaded ---
+  }, [isLoaded, isSignedIn]);
+
+  const filteredAndSortedVideos = useMemo(() => {
+    if (!feedVideos) return [];
+
+    const [min, max] = durationRange;
+    const filtered = feedVideos.filter((video) => {
+      const durationMinutes = video.durationSeconds / 60;
+
+      const isAboveMin = durationMinutes >= min;
+      const isBelowMax = max >= 60 ? true : durationMinutes <= max;
+
+      return isAboveMin && isBelowMax;
+    });
+
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.publishedAt);
+      const dateB = new Date(b.publishedAt);
+
+      if (sortBy === 'oldest') {
+        return dateA - dateB;
+      }
+      return dateB - dateA;
+    });
+  }, [feedVideos, sortBy, durationRange]);
 
   return (
     <>
@@ -109,10 +129,30 @@ export default function FeedPage() {
           {!isLoading &&
             !error &&
             (feedVideos.length > 0 ? (
-              <FeedGrid
-                videos={feedVideos}
-                onVideoSelect={setSelectedVideoId}
-              />
+              <>
+                <FilterControls
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                  durationRange={durationRange}
+                  setDurationRange={setDurationRange}
+                  showSlicer={true}
+                />
+                {filteredAndSortedVideos.length > 0 ? (
+                  <FeedGrid
+                    videos={filteredAndSortedVideos}
+                    onVideoSelect={setSelectedVideoId}
+                  />
+                ) : (
+                  <div className="text-center py-20">
+                    <h2 className="text-2xl font-bold text-[var(--secundarius)]">
+                      No videos match your filters
+                    </h2>
+                    <p className="text-gray-500 mt-2">
+                      Try adjusting the duration range.
+                    </p>
+                  </div>
+                )}
+              </>
             ) : (
               <FeedEmptyState isSignedIn={isSignedIn} />
             ))}

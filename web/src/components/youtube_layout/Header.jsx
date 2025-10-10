@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler';
+import { RainbowButton } from '../magicui/rainbow-button';
 
 export default function Header() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +25,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur sm:px-6">
       <SidebarTrigger className="md:hidden" />
-
+      <RainbowButton href="/feed">My feed</RainbowButton>
       <div className="flex-1 flex justify-center px-4">
         {/* --- UPDATED: Added a submit button to the form --- */}
         <form

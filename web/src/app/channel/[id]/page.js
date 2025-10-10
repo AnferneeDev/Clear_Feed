@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { saveChannelToHistory } from '@/lib/user.service';
@@ -11,7 +11,11 @@ import {
   VideoPlayer,
 } from '@/components/channel_id/index';
 import { AppLayout } from '@/components/youtube_layout/index';
-import { ChannelHeader, VideoGrid } from '@/components/channel_view/index';
+import {
+  ChannelHeader,
+  VideoGrid,
+  FilterControls,
+} from '@/components/channel_view/index';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 export default function ChannelPage() {
@@ -27,11 +31,13 @@ export default function ChannelPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const historySavedRef = useRef(false);
 
+  const [sortBy, setSortBy] = useState('newest');
+  const [durationRange, setDurationRange] = useState([2, 60]);
+
   const [loadMoreRef, isIntersecting] = useIntersectionObserver({
     threshold: 0.1,
   });
 
-  // Data Fetching Effect
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
@@ -61,10 +67,9 @@ export default function ChannelPage() {
     fetchChannelData();
   }, [id]);
 
-  // History Saving Effect
   useEffect(() => {
     if (user && channelData?.channelInfo && !historySavedRef.current) {
-      historySavedRef.current = true;
+      historySavedRef.current = channelData.channelInfo.id;
       saveChannelToHistory(
         {
           id: channelData.channelInfo.id,
@@ -74,10 +79,9 @@ export default function ChannelPage() {
         user
       );
     }
-  }, [channelData, user, id]);
+  }, [channelData, user]);
 
-  // Load More Logic
-  const handleLoadMore = async () => {
+  const handleLoadMore = useCallback(async () => {
     if (!nextPageToken || isLoadingMore) return;
     setIsLoadingMore(true);
     try {
@@ -98,14 +102,37 @@ export default function ChannelPage() {
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [id, isLoadingMore, nextPageToken]);
 
-  // Effect to trigger loading more videos
   useEffect(() => {
-    if (isIntersecting && nextPageToken && !isLoadingMore && !isLoading) {
+    if (isIntersecting && !isLoading) {
       handleLoadMore();
     }
-  }, [isIntersecting, nextPageToken, isLoading, isLoadingMore]);
+  }, [isIntersecting, isLoading, handleLoadMore]);
+
+  const filteredAndSortedVideos = useMemo(() => {
+    if (!channelData?.videos) return [];
+
+    const [min, max] = durationRange;
+    const filtered = channelData.videos.filter((video) => {
+      const durationMinutes = video.durationSeconds / 60;
+
+      const isAboveMin = durationMinutes >= min;
+      const isBelowMax = max >= 60 ? true : durationMinutes <= max;
+
+      return isAboveMin && isBelowMax;
+    });
+
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.publishedAt);
+      const dateB = new Date(b.publishedAt);
+
+      if (sortBy === 'oldest') {
+        return dateA - dateB;
+      }
+      return dateB - dateA;
+    });
+  }, [channelData?.videos, sortBy, durationRange]);
 
   return (
     <>
@@ -135,12 +162,28 @@ export default function ChannelPage() {
         {!isLoading && !error && channelData?.videos?.length > 0 && (
           <div className="p-4 md:p-8">
             <ChannelHeader channelInfo={channelData.channelInfo} />
-            <VideoGrid
-              videos={channelData.videos}
-              onVideoSelect={setSelectedVideoId}
+            <FilterControls
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              durationRange={durationRange}
+              setDurationRange={setDurationRange}
+              showSlider={false}
             />
-
-            {/* --- UPDATED: Taller trigger area to prevent layout shift --- */}
+            {filteredAndSortedVideos.length > 0 ? (
+              <VideoGrid
+                videos={filteredAndSortedVideos}
+                onVideoSelect={setSelectedVideoId}
+              />
+            ) : (
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-[var(--secundarius)]">
+                  No videos match your filters
+                </h2>
+                <p className="text-gray-500 mt-2">
+                  Try adjusting the duration range.
+                </p>
+              </div>
+            )}
             <div
               ref={loadMoreRef}
               className="h-40 mt-8 flex justify-center items-start"
