@@ -43,7 +43,7 @@ export default function Header() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
 
           {/* This button triggers the onSubmit when Enter is pressed */}
-          <Button
+          <RainbowButton
             type="submit"
             size="icon"
             variant="ghost"
@@ -51,7 +51,7 @@ export default function Header() {
           >
             <Search className="h-5 w-5 text-muted-foreground" />
             <span className="sr-only">Search</span>
-          </Button>
+          </RainbowButton>
         </form>
       </div>
 
