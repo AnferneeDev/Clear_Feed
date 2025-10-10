@@ -67,7 +67,7 @@ export default function ChannelPage() {
       historySavedRef.current = true;
       saveChannelToHistory(
         {
-          id: id,
+          id: channelData.channelInfo.id,
           title: channelData.channelInfo.title,
           thumbnail: channelData.channelInfo.thumbnail,
         },
