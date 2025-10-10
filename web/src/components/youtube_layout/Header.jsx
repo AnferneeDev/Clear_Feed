@@ -1,16 +1,24 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler'; // Already correct
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler';
 
 export default function Header() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
+
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Search submitted');
+    if (!searchTerm.trim()) {
+      return;
+    }
+    router.push(`/channel/${encodeURIComponent(searchTerm.trim())}`);
   };
 
   return (
@@ -18,13 +26,31 @@ export default function Header() {
       <SidebarTrigger className="md:hidden" />
 
       <div className="flex-1 flex justify-center px-4">
-        <form onSubmit={handleSearch} className="w-full max-w-lg relative">
+        {/* --- UPDATED: Added a submit button to the form --- */}
+        <form
+          onSubmit={handleSearch}
+          className="w-full max-w-lg relative flex items-center"
+        >
           <Input
             type="search"
-            placeholder="Search for a new channel..."
-            className="w-full rounded-full bg-secundarius pl-10 h-10"
+            placeholder="Paste a YouTube channel URL or @handle..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            // Added pr-10 to make space for the button on the right
+            className="w-full rounded-full bg-secondary pl-10 pr-12 h-10"
           />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+
+          {/* This button triggers the onSubmit when Enter is pressed */}
+          <Button
+            type="submit"
+            size="icon"
+            variant="ghost"
+            className="absolute right-1 h-8 w-8 rounded-full"
+          >
+            <Search className="h-5 w-5 text-muted-foreground" />
+            <span className="sr-only">Search</span>
+          </Button>
         </form>
       </div>
 
