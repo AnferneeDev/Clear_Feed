@@ -11,11 +11,8 @@ import {
   VideoPlayer,
 } from '@/components/channel_id/index';
 import { AppLayout } from '@/components/youtube_layout/index';
-import {
-  ChannelHeader,
-  VideoGrid,
-  LoadMoreButton,
-} from '@/components/channel_view/index';
+import { ChannelHeader, VideoGrid } from '@/components/channel_view/index';
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
 
 export default function ChannelPage() {
   const { user } = useUser();
@@ -30,7 +27,11 @@ export default function ChannelPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const historySavedRef = useRef(false);
 
-  // --- Data Fetching Effect ---
+  const [loadMoreRef, isIntersecting] = useIntersectionObserver({
+    threshold: 0.1,
+  });
+
+  // Data Fetching Effect
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
@@ -60,7 +61,7 @@ export default function ChannelPage() {
     fetchChannelData();
   }, [id]);
 
-  // --- History Saving Effect ---
+  // History Saving Effect
   useEffect(() => {
     if (user && channelData?.channelInfo && !historySavedRef.current) {
       historySavedRef.current = true;
@@ -75,7 +76,7 @@ export default function ChannelPage() {
     }
   }, [channelData, user, id]);
 
-  // --- Load More Logic ---
+  // Load More Logic
   const handleLoadMore = async () => {
     if (!nextPageToken || isLoadingMore) return;
     setIsLoadingMore(true);
@@ -98,6 +99,13 @@ export default function ChannelPage() {
       setIsLoadingMore(false);
     }
   };
+
+  // Effect to trigger loading more videos
+  useEffect(() => {
+    if (isIntersecting && nextPageToken && !isLoadingMore && !isLoading) {
+      handleLoadMore();
+    }
+  }, [isIntersecting, nextPageToken, isLoading, isLoadingMore]);
 
   return (
     <>
@@ -131,11 +139,14 @@ export default function ChannelPage() {
               videos={channelData.videos}
               onVideoSelect={setSelectedVideoId}
             />
-            <LoadMoreButton
-              isLoadingMore={isLoadingMore}
-              nextPageToken={nextPageToken}
-              onLoadMore={handleLoadMore}
-            />
+
+            {/* --- UPDATED: Taller trigger area to prevent layout shift --- */}
+            <div
+              ref={loadMoreRef}
+              className="h-40 mt-8 bg-fuchsia-400 flex justify-center items-start"
+            >
+              {isLoadingMore && nextPageToken && <LoadingSpinner />}
+            </div>
           </div>
         )}
       </AppLayout>
