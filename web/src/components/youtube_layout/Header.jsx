@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler'; // Already correct
 
-// This is the top header, now including the SidebarTrigger
-// --- UPDATED: Changed to a named export ---
 export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault();
@@ -30,6 +29,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
+        <AnimatedThemeToggler />
         <SignedOut>
           <SignInButton mode="modal">
             <Button size="sm">Sign In</Button>
