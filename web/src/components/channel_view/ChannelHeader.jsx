@@ -10,7 +10,7 @@ export function ChannelHeader({ channelInfo }) {
         alt={channelInfo.title}
         width={128}
         height={128}
-        className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg -mt-16 sm:-mt-20"
+        className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg -mt-8 sm:-mt-12"
       />
       <div className="text-center sm:text-left">
         <h1 className="text-2xl md:text-4xl font-bold text-[var(--secundarius)]">
