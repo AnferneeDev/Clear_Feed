@@ -12,7 +12,6 @@ import {
 } from '@/components/landing_page';
 
 export default function Home() {
-  // State and logic are kept in the parent component
   const [channelUrl, setChannelUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,18 +19,20 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!channelUrl) {
+
+    // --- THE FIX: Use the 'channelUrl' state variable ---
+    const searchInput = channelUrl.trim();
+
+    if (!searchInput) {
       setError('Please enter a YouTube channel URL or @handle.');
       return;
     }
-    setError('');
+
+    // This is a good place to set loading state for the page transition
     setIsLoading(true);
+    setError('');
 
-    const match = channelUrl.match(/(?:@|c\/|channel\/)([^/]+)/);
-    const id = match ? match[1] : channelUrl;
-    const finalId = id.startsWith('@') ? id : `@${id}`;
-
-    router.push(`/channel/${encodeURIComponent(finalId)}`);
+    router.push(`/channel/${encodeURIComponent(searchInput)}`);
   };
 
   const scrollToSection = (id) => {

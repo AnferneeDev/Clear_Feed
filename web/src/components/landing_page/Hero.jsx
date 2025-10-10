@@ -67,8 +67,9 @@ export default function HeroSection({
               className="shadow-2xl w-full sm:w-auto"
               background="oklch(from var(--primarius) l c h)"
               shimmerSize="0.25em"
+              shimmerColor="rgba(200, 200, 200, 1)" // gray
             >
-              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-base">
+              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-foreground lg:text-base">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
