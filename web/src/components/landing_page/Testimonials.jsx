@@ -4,7 +4,7 @@ export default function TestimonialsSection({ testimonials }) {
   return (
     <section
       id="testimonials"
-      className="py-24 w-full bg-white/60 scroll-mt-24"
+      className="py-24 w-full bg-gray-500/40 scroll-mt-24"
     >
       <div className="container mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">

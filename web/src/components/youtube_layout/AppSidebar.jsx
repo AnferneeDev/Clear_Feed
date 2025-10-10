@@ -88,11 +88,7 @@ export default function AppSidebar() {
             <SidebarGroupLabel className="data-[state=collapsed]:hidden">
               Following
             </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <div className="px-4 py-2 text-xs text-muted-foreground data-[state=collapsed]:hidden">
-                Coming soon...
-              </div>
-            </SidebarGroupContent>
+            <SidebarGroupContent></SidebarGroupContent>
           </SidebarGroup>
 
           {/* "Recent" History Group */}
@@ -113,7 +109,7 @@ export default function AppSidebar() {
                             href={`/channel/${channel.id}`}
                             className="w-full"
                           >
-                            <div className="flex items-center justify-center pl-2">
+                            <div className="flex items-center justify-center group-data-[collapsible=icon]:-ml-2">
                               <Image
                                 src={channel.thumbnail}
                                 alt={channel.title}
