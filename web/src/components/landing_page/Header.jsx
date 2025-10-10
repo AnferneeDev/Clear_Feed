@@ -35,7 +35,9 @@ export default function Header({ scrollToSection }) {
           <AnimatedThemeToggler />
           <SignedOut>
             <SignInButton mode="modal">
-              <Button size="sm">Sing in</Button>
+              <Button size="sm" className={'text-foreground'}>
+                Sing in
+              </Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
@@ -51,7 +53,9 @@ export default function Header({ scrollToSection }) {
             {/* --- UPDATED: Grouped both buttons for mobile --- */}
             <div className="flex items-center gap-1">
               <SignInButton mode="modal">
-                <Button size="sm">Sing in</Button>
+                <Button size="sm" className={'text-foreground'}>
+                  Sing in
+                </Button>
               </SignInButton>
             </div>
           </SignedOut>
