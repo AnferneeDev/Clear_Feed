@@ -17,13 +17,14 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { Rss } from 'lucide-react'; // --- ADDED: Icon for the feed link ---
 
 export default function AppSidebar() {
   const { user } = useUser();
   const channelHistory = getChannelHistory(user);
 
   return (
-    <Sidebar collapsible="icon" className="overflow-x-hidden">
+    <Sidebar collapsible="icon" className="overflow-x-hidden bg-background">
       <SidebarRail />
       <SidebarContent className="overflow-x-hidden">
         <SidebarGroup>
@@ -31,7 +32,8 @@ export default function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="flex items-center gap-2">
-                  <SidebarTrigger className={'w-10 h-10'} />
+                  {/* --- CHANGE 1: Increased trigger size --- */}
+                  <SidebarTrigger className={'w-11 h-11'} />
                   <SidebarMenuButton asChild>
                     <Link href="/" className="flex items-center gap-2">
                       <Image
@@ -53,27 +55,51 @@ export default function AppSidebar() {
         </SidebarGroup>
 
         <SignedIn>
+          {/* --- CHANGE 2: Added a separator --- */}
+          <SidebarSeparator />
+
+          {/* "My Feed" Group */}
+          <SidebarGroup>
+            <SidebarGroupLabel className="data-[state=collapsed]:hidden">
+              My feed
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link
+                      href="/feed"
+                      className="w-full flex items-center gap-3"
+                    >
+                      {/* --- CHANGE 3: Added an icon for the feed --- */}
+                      <Rss className="h-5 w-5 flex-shrink-0" />
+                      <span className="data-[state=collapsed]:hidden truncate">
+                        Feed
+                      </span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* --- CHANGE 4: Added a new, empty "Following" group --- */}
+          <SidebarGroup>
+            <SidebarGroupLabel className="data-[state=collapsed]:hidden">
+              Following
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="px-4 py-2 text-xs text-muted-foreground data-[state=collapsed]:hidden">
+                Coming soon...
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* "Recent" History Group */}
           {channelHistory.length > 0 && (
             <>
+              {/* --- CHANGE 5: Added a separator --- */}
               <SidebarSeparator />
-              <SidebarGroup>
-                <SidebarGroupLabel className="data-[state=collapsed]:hidden">
-                  My feed
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild>
-                        <Link href="/feed" className="w-full">
-                          <span className="data-[state=collapsed]:hidden truncate">
-                            Feed
-                          </span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
               <SidebarGroup>
                 <SidebarGroupLabel className="data-[state=collapsed]:hidden">
                   Recent
@@ -87,7 +113,7 @@ export default function AppSidebar() {
                             href={`/channel/${channel.id}`}
                             className="w-full"
                           >
-                            <div className="flex items-center justify-center">
+                            <div className="flex items-center justify-center pl-2">
                               <Image
                                 src={channel.thumbnail}
                                 alt={channel.title}

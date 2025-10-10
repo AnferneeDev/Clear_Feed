@@ -163,7 +163,7 @@
   --chart-5: oklch(0.47 0.1 70.08);
 
   /* Sidebar: neutral surface with restrained highlights */
-  --sidebar: oklch(0.09 0.02 15);
+  --sidebar: var(--background);
   --sidebar-foreground: var(--secundarius);
   --sidebar-primary: oklch(0.28 0.03 15);
   --sidebar-primary-foreground: var(--secundarius);
