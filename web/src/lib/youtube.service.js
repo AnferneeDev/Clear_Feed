@@ -62,13 +62,18 @@ export class YouTubeService {
 
   // --- Helper to resolve any input (URL or handle) to a channel object ---
   static async _getChannelFromIdentifier(identifier) {
-    let videoId = null;
+    // --- THIS IS THE CHANGE: Check if it's a YouTube Channel ID first. ---
+    // YouTube Channel IDs always start with "UC" and are typically 24 characters long.
+    if (identifier.startsWith('UC') && identifier.length >= 24) {
+      return this._fetchChannelDetails({ channelId: identifier });
+    }
 
+    let videoId = null;
     try {
       if (identifier.includes('youtube.com/watch')) {
         videoId = new URL(identifier).searchParams.get('v');
       } else if (identifier.includes('youtu.be/')) {
-        videoId = new URL(identifier).pathname.substring(1).split('?')[0]; // Ensure no query params on youtu.be
+        videoId = new URL(identifier).pathname.substring(1).split('?')[0];
       }
     } catch (error) {
       // If URL parsing fails, it's not a valid URL, so treat as a handle
@@ -84,7 +89,7 @@ export class YouTubeService {
       }
       return this._fetchChannelDetails({ channelId });
     } else {
-      // If it's not a video URL, assume it's a handle
+      // If it's neither a Channel ID nor a video URL, assume it's a channel handle
       return this._fetchChannelDetails({ handle: identifier });
     }
   }
