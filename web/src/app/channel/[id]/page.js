@@ -143,7 +143,7 @@ export default function ChannelPage() {
             {/* --- UPDATED: Taller trigger area to prevent layout shift --- */}
             <div
               ref={loadMoreRef}
-              className="h-40 mt-8 bg-fuchsia-400 flex justify-center items-start"
+              className="h-40 mt-8 flex justify-center items-start"
             >
               {isLoadingMore && nextPageToken && <LoadingSpinner />}
             </div>

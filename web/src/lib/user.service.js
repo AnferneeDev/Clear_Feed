@@ -36,5 +36,15 @@ export const saveChannelToHistory = async (channel, user) => {
  * @returns {Array} The user's channel history, or an empty array.
  */
 export const getChannelHistory = (user) => {
-  return user?.publicMetadata?.channelHistory || [];
+  const history = user?.publicMetadata?.channelHistory || [];
+
+  // Client-side deduplication as a safety net
+  const deduplicated = history.reduce((acc, channel) => {
+    if (!acc.find((c) => c.id === channel.id)) {
+      acc.push(channel);
+    }
+    return acc;
+  }, []);
+
+  return deduplicated;
 };

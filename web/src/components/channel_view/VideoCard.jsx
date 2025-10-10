@@ -36,9 +36,9 @@ export function VideoCard({ video, onVideoSelect }) {
         </span>
       </div>
       <div className="mt-3">
-        <h3 className="font-semibold text-base text-[var(--secundarius)] leading-tight truncate group-hover:text-[var(--primarius)] transition-colors">
+        <h4 className="font-semibold text-base text-[var(--secundarius)] leading-tight line-clamp-3 group-hover:text-[var(--primarius)] transition-colors">
           {video.title}
-        </h3>
+        </h4>
         <p className="text-sm text-gray-500 mt-1">
           {new Date(video.publishedAt).toLocaleDateString('en-CA')}
         </p>

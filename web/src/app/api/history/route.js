@@ -8,16 +8,13 @@ export const dynamic = 'force-dynamic';
 export async function POST(request) {
   console.log('--- /api/history ENDPOINT WAS HIT ---');
 
-  // FIXED: await auth() in App Router
   const { userId } = await auth();
-
   if (!userId) {
     return new Response('Unauthorized', { status: 401 });
   }
 
   try {
     const newChannel = await request.json();
-
     if (!newChannel || !newChannel.id || !newChannel.title) {
       return NextResponse.json(
         { message: 'Invalid channel data.' },
@@ -25,20 +22,31 @@ export async function POST(request) {
       );
     }
 
-    // FIXED: await clerkClient() call
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     const history = user.publicMetadata.channelHistory || [];
 
-    // History Management Logic
-    const filteredHistory = history.filter(
-      (channel) => channel.id !== newChannel.id
-    );
+    // ✅ Use handle for deduplication if available, otherwise fall back to id
+    const uniqueKey = newChannel.handle || newChannel.id;
 
-    const updatedHistory = [newChannel, ...filteredHistory];
-    const finalHistory = updatedHistory.slice(0, 5);
+    // ✅ Check if this channel is already at the top
+    if (history.length > 0) {
+      const topChannelKey = history[0].handle || history[0].id;
+      if (topChannelKey === uniqueKey) {
+        console.log('Channel already at top of history, skipping update');
+        return NextResponse.json({ success: true, history });
+      }
+    }
 
-    // FIXED: await clerkClient() call here too
+    // ✅ Remove any existing instances of this channel by handle (or id if no handle)
+    const filteredHistory = history.filter((c) => {
+      const channelKey = c.handle || c.id;
+      return channelKey !== uniqueKey;
+    });
+
+    // ✅ Add new channel to the front and limit to 5
+    const finalHistory = [newChannel, ...filteredHistory].slice(0, 5);
+
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
         ...user.publicMetadata,
