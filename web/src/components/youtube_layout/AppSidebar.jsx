@@ -36,13 +36,15 @@ export default function AppSidebar() {
 
                   <SidebarMenuButton asChild>
                     <Link href="/feed" className="flex items-center gap-2">
-                      <Image
-                        src="/clear_feed.png"
-                        alt="Clear Feed logo"
-                        width={32}
-                        height={32}
-                        className="flex-shrink-0"
-                      />
+                      <div className="rounded bg-white">
+                        <Image
+                          src="/clear_feed.png"
+                          alt="Clear Feed logo"
+                          width={32}
+                          height={32}
+                          className="flex-shrink-0"
+                        />
+                      </div>
                       <span className="text-xl font-bold data-[state=collapsed]:hidden truncate">
                         Clear Feed
                       </span>

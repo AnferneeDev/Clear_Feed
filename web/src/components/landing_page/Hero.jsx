@@ -2,10 +2,10 @@
 
 import { Input } from '@/components/ui/input';
 import {
-  ShimmerButton,
   AnimatedGridPattern,
   BoxReveal,
   Highlighter,
+  RainbowButton,
 } from '@/components/magicui/index';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
@@ -49,7 +49,7 @@ export default function HeroSection({
 
         {/* --- UPGRADED SEARCH BAR --- */}
         {/* This outer div creates the gradient border effect */}
-        <div className="relative mt-8 w-full max-w-xl rounded-lg bg-gradient-to-r from-[var(--primarius)] via-purple-500 to-red-500 p-[1px] focus-within:ring-2 focus-within:ring-[var(--primarius)] transition-all duration-300">
+        <div className="relative mt-8 w-full max-w-xl rounded-lg bg-gradient-to-r from-[var(--primarius)] via-purple-500 to-red-500 p-[1px] focus-within:ring-2 focus-within:ring-[var(--primarius)] transition-all duration-300 ">
           <form
             onSubmit={handleSearch}
             className="flex flex-col sm:flex-row items-stretch gap-3 w-full bg-[var(--neuter)] p-2 rounded-[7px]" // Inner background
@@ -61,25 +61,21 @@ export default function HeroSection({
               placeholder="Paste a YouTube channel URL or @handle"
               className="py-6 text-base sm:flex-grow h-12 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0" // Transparent with no focus ring
             />
-            <ShimmerButton
+            <RainbowButton
               type="submit" // --- THE FUNCTIONAL FIX ---
               disabled={isLoading}
-              className="shadow-2xl w-full sm:w-auto"
-              background="oklch(from var(--primarius) l c h)"
-              shimmerSize="0.25em"
-              shimmerColor="rgba(200, 200, 200, 1)" // gray
+              className="mt-2"
             >
-              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-foreground lg:text-base">
+              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:text-black lg:text-base">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
                   </>
                 ) : (
-                  'Create Focused Feed'
+                  'Create Feed'
                 )}
               </span>
-            </ShimmerButton>
+            </RainbowButton>
           </form>
         </div>
 

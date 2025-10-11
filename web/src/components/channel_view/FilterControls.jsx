@@ -26,9 +26,6 @@ export function FilterControls({
     // --- UPDATED: Removed justify-between/justify-end ---
     <div className="flex flex-col sm:flex-row gap-6 items-center mb-8">
       <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
-        <span className="text-sm font-medium text-muted-foreground">
-          Sort By
-        </span>
         <ToggleGroup
           type="single"
           value={sortBy}

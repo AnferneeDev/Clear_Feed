@@ -12,12 +12,14 @@ export default function Header({ scrollToSection }) {
       <div className="container mx-auto px-6 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 cursor-pointer">
-          <Image
-            src="/clear_feed.png"
-            alt="Clear Feed logo"
-            width={40}
-            height={40}
-          />
+          <div className="rounded-full bg-white">
+            <Image
+              src="/clear_feed.png"
+              alt="Clear Feed logo"
+              width={40}
+              height={40}
+            />
+          </div>
           <span className="text-xl font-bold">Clear Feed</span>
         </Link>
 

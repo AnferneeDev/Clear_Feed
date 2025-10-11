@@ -9,6 +9,7 @@ import { Search } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler';
 import { RainbowButton } from '../magicui/rainbow-button';
+import Link from 'next/link';
 
 export default function Header() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,7 +26,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur sm:px-6">
       <SidebarTrigger className="md:hidden" />
-      <RainbowButton href="/feed">My feed</RainbowButton>
+      <RainbowButton>
+        <Link href="/feed">My feed</Link>
+      </RainbowButton>
       <div className="flex-1 flex justify-center px-4">
         {/* --- UPDATED: Added a submit button to the form --- */}
         <form
@@ -38,7 +41,7 @@ export default function Header() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             // Added pr-10 to make space for the button on the right
-            className="w-full rounded-full bg-secondary pl-10 pr-12 h-10"
+            className="w-full rounded-full bg-background pl-10 pr-12 h-10"
           />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
 
@@ -46,8 +49,7 @@ export default function Header() {
           <RainbowButton
             type="submit"
             size="icon"
-            variant="ghost"
-            className="absolute right-1 h-8 w-8 rounded-full"
+            className="absolute right-4 h-8 w-12 rounded-full p-0 flex items-center justify-center"
           >
             <Search className="h-5 w-5 text-muted-foreground" />
             <span className="sr-only">Search</span>
