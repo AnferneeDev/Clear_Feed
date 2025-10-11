@@ -5,12 +5,12 @@ import { useRouter, usePathname } from 'next/navigation';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, Rss } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler';
-import { RainbowButton } from '../magicui/rainbow-button';
-import Link from 'next/link';
+import { ShinyButton } from '../magicui';
 import { cn } from '@/lib/utils';
+import { SupportButton } from './SupportButton';
 
 export default function NavBar() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,26 +24,36 @@ export default function NavBar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchTerm.trim()) {
-      return;
-    }
+    if (!searchTerm.trim()) return;
     setIsLoading(true);
     router.push(`/channel/${encodeURIComponent(searchTerm.trim())}`);
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur sm-px-6">
-      <SidebarTrigger className="md:hidden" />
+    <header className="sticky top-0 z-20 h-16 flex items-center border-b bg-background/95 px-2 sm:px-4 backdrop-blur">
+      {/* LEFT: 20% of the navbar; content centered */}
+      <div className="basis-[20%] flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          {/* keep SidebarTrigger here but hidden on md+ (same as before) */}
+          <SidebarTrigger className="md:hidden mr-2" />
+          {pathname !== '/feed' && (
+            <ShinyButton
+              className="px-2 md:px-6 bg-[var(--primarius)] text-foreground min-w-[60px] whitespace-nowrap"
+              onClick={() => router.push('/feed')}
+            >
+              <div className="flex items-center gap-2">
+                <Rss className="h-5 w-5 flex-shrink-0" />
+                <span className="font-bold hidden md:inline">Feed</span>
+                <span className="sr-only">Feed</span>
+              </div>
+            </ShinyButton>
+          )}
+        </div>
+      </div>
 
-      {/* --- UPDATED: Conditionally render the button --- */}
-      {pathname !== '/feed' && (
-        <RainbowButton>
-          <Link href="/feed">My feed</Link>
-        </RainbowButton>
-      )}
-
-      <div className="flex-1 flex justify-center px-4">
-        <div className="w-full max-w-lg relative">
+      {/* CENTER: 60% of navbar (search occupies this area) */}
+      <div className="basis-[60%] flex items-center justify-center px-4">
+        <div className="w-full max-w-full min-w-0">
           <div
             className={cn(
               'relative rounded-full bg-gradient-to-r from-[var(--primarius)] via-purple-500 to-red-500 p-[1px] transition-all duration-300',
@@ -61,7 +71,7 @@ export default function NavBar() {
                 placeholder="Paste a YouTube channel URL, video URL, or @handle"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="py-6 text-base rounded-full sm:flex-grow h-12 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-8 truncate"
+                className="py-6 text-base rounded-full bg-transparent border-none sm:ml-2 sm:flex-grow h-12 focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-8 truncate min-w-0"
               />
             </form>
           </div>
@@ -83,16 +93,24 @@ export default function NavBar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <AnimatedThemeToggler />
-        <SignedOut>
-          <SignInButton mode="modal">
-            <Button size="sm">Sign In</Button>
-          </SignInButton>
-        </SignedOut>
-        <SignedIn>
-          <UserButton afterSignOutUrl="/" />
-        </SignedIn>
+      {/* RIGHT: 20% of the navbar; contents centered and won't wrap */}
+      <div className="basis-[20%] flex items-center justify-center gap-2 flex-nowrap">
+        <div className="flex items-center justify-center gap-2 flex-nowrap">
+          <SupportButton />
+
+          <div className="hidden md:flex">
+            <AnimatedThemeToggler />
+          </div>
+
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button size="sm">Sign In</Button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
       </div>
     </header>
   );

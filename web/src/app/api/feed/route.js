@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'; // --- UPDATED
+import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { YouTubeService } from '@/lib/youtube.service';
 
@@ -8,7 +8,6 @@ export async function GET() {
   console.log('/**********************/');
   console.log('[FEED API] Received GET request.');
 
-  // --- UPDATED: Use currentUser() for more reliability ---
   const user = await currentUser();
   console.log(
     '[FEED API] User object from currentUser():',
@@ -22,20 +21,30 @@ export async function GET() {
   }
 
   try {
-    const history = user.publicMetadata.channelHistory || [];
-    console.log('[FEED API] Fetched History from Clerk:', history);
+    // --- UPDATED: Use followedChannels instead of channelHistory ---
+    const followedChannels = user.publicMetadata.followedChannels || [];
+    console.log(
+      '[FEED API] Fetched Followed Channels from Clerk:',
+      followedChannels
+    );
 
-    if (history.length === 0) {
-      console.log('[FEED API] History array is empty, returning empty feed.');
+    if (followedChannels.length === 0) {
+      console.log(
+        '[FEED API] Followed Channels array is empty, returning empty feed.'
+      );
       console.log('/**********************/');
       return NextResponse.json([]);
     }
 
-    const handles = history.map((channel) => channel.id);
-    console.log('[FEED API] Extracted handles for YouTube service:', handles);
+    // The 'id' property here is the unique YouTube Channel ID (UC...)
+    const channelIds = followedChannels.map((channel) => channel.id);
+    console.log(
+      '[FEED API] Extracted Channel IDs for YouTube service:',
+      channelIds
+    );
 
     console.log('[FEED API] Calling YouTubeService.getFeedForChannels...');
-    const feedVideos = await YouTubeService.getFeedForChannels(handles);
+    const feedVideos = await YouTubeService.getFeedForChannels(channelIds);
     console.log('[FEED API] Final feed video count:', feedVideos.length);
     console.log('/**********************/');
 

@@ -3,6 +3,7 @@ import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/ui/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
           >
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               {children}
+              <Toaster />
             </ThemeProvider>
           </body>
         </html>

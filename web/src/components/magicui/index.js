@@ -4,3 +4,4 @@ export { default as AnimatedGridPattern } from '@/components/magicui/animated-gr
 export { default as Highlighter } from '@/components/magicui/highlighter';
 export * from '@/components/magicui/rainbow-button';
 export * from '@/components/magicui/magic-card';
+export * from '@/components/magicui/shiny-button';

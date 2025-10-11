@@ -17,10 +17,12 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { Rss } from 'lucide-react';
 
 export default function AppSidebar() {
   const { user } = useUser();
   const channelHistory = getChannelHistory(user);
+  const followedChannels = user?.publicMetadata?.followedChannels || [];
 
   return (
     <Sidebar collapsible="icon" className="overflow-x-hidden bg-background">
@@ -31,11 +33,9 @@ export default function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="flex items-center gap-2">
-                  {/* --- SidebarTrigger with hamburger icon --- */}
-                  <SidebarTrigger className="w-11 h-11 flex items-center justify-center"></SidebarTrigger>
-
+                  <SidebarTrigger className="w-11 h-11 flex items-center justify-center group-data-[collapsible=icon]:-ml-1.5"></SidebarTrigger>
                   <SidebarMenuButton asChild>
-                    <Link href="/feed" className="flex items-center gap-2">
+                    <Link href="/" className="flex items-center gap-2">
                       <div className="rounded-full bg-white">
                         <Image
                           src="/clear_feed.png"
@@ -57,21 +57,47 @@ export default function AppSidebar() {
         </SidebarGroup>
 
         <SignedIn>
-          {/* --- CHANGE 2: Added a separator --- */}
-          <SidebarSeparator />
-
-          {/* --- CHANGE 4: Added a new, empty "Following" group --- */}
           <SidebarGroup>
             <SidebarGroupLabel className="data-[state=collapsed]:hidden">
-              Following
+              Following ({followedChannels.length}/5)
             </SidebarGroupLabel>
-            <SidebarGroupContent></SidebarGroupContent>
+            <SidebarGroupContent className={'mr-8'}>
+              <SidebarMenu>
+                {followedChannels.length > 0 ? (
+                  followedChannels.map((channel) => (
+                    <SidebarMenuItem key={channel.id}>
+                      <SidebarMenuButton asChild tooltip={channel.title}>
+                        <Link
+                          href={`/channel/${channel.handle || channel.id}`}
+                          className="w-full"
+                        >
+                          <div className="flex items-center justify-center group-data-[collapsible=icon]:-ml-2">
+                            <Image
+                              src={channel.thumbnail}
+                              alt={channel.title}
+                              width={32}
+                              height={32}
+                              className="rounded-full flex-shrink-0"
+                            />
+                          </div>
+                          <span className="data-[state=collapsed]:hidden truncate">
+                            {channel.title}
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))
+                ) : (
+                  <span className="px-4 py-2 text-xs text-muted-foreground data-[state=collapsed]:hidden">
+                    Follow channels to see them here.
+                  </span>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* "Recent" History Group */}
           {channelHistory.length > 0 && (
             <>
-              {/* --- CHANGE 5: Added a separator --- */}
               <SidebarSeparator />
               <SidebarGroup>
                 <SidebarGroupLabel className="data-[state=collapsed]:hidden">

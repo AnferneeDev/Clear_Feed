@@ -6,6 +6,7 @@ import {
   BoxReveal,
   Highlighter,
   RainbowButton,
+  ShinyButton,
 } from '@/components/magicui/index';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
@@ -61,12 +62,12 @@ export default function HeroSection({
               placeholder="Paste a YouTube channel URL, video URL, or @handle"
               className="py-6 text-base rounded-full sm:flex-grow h-12 bg-gray-300 dark:bg-white dark:text-black border-none focus-visible:ring-0 focus-visible:ring-offset-0" // Transparent with no focus ring
             />
-            <RainbowButton
+            <ShinyButton
               type="submit"
               disabled={isLoading}
-              className="mt-2 min-w-[140px] flex justify-center items-center"
+              className=" min-w-[140px] flex justify-center items-center bg-[var(--primarius)] "
             >
-              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:text-black lg:text-base">
+              <span className="whitespace-pre-wrap font-bold text-center text-sm leading-none tracking-tight text-foreground lg:text-base">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -75,7 +76,7 @@ export default function HeroSection({
                   'Search channel'
                 )}
               </span>
-            </RainbowButton>
+            </ShinyButton>
           </form>
         </div>
 

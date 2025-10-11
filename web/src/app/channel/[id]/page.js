@@ -17,12 +17,12 @@ import {
   FilterControls,
 } from '@/components/channel_view/index';
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
+import { toast } from 'sonner';
 
 export default function ChannelPage() {
   const { user } = useUser();
   const params = useParams();
   const id = params.id;
-
   const [channelData, setChannelData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +38,56 @@ export default function ChannelPage() {
     threshold: 0.1,
   });
 
+  const followedChannels = user?.publicMetadata?.followedChannels || [];
+  const isFollowing = useMemo(
+    () =>
+      channelData
+        ? followedChannels.some((c) => c.id === channelData.channelInfo.id)
+        : false,
+    [followedChannels, channelData]
+  );
+
+  const handleFollowToggle = async () => {
+    if (!channelData?.channelInfo || !user) return;
+
+    try {
+      const response = await fetch('/api/follow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: channelData.channelInfo.id,
+          handle: channelData.channelInfo.customUrl,
+          title: channelData.channelInfo.title,
+          thumbnail: channelData.channelInfo.thumbnail,
+        }),
+        cache: 'no-store',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await user.reload();
+        toast.success(
+          data.action === 'followed'
+            ? 'Channel Followed'
+            : 'Channel Unfollowed',
+          {
+            description: `${channelData.channelInfo.title} has been ${data.action}.`,
+          }
+        );
+      } else {
+        toast.error('Error', {
+          description: data.message,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+      toast.error('Client Error', {
+        description: 'Could not complete the request.',
+      });
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
@@ -45,7 +95,6 @@ export default function ChannelPage() {
     setChannelData(null);
     setNextPageToken(null);
     historySavedRef.current = false;
-
     const fetchChannelData = async () => {
       try {
         const response = await fetch(
@@ -112,21 +161,16 @@ export default function ChannelPage() {
 
   const filteredAndSortedVideos = useMemo(() => {
     if (!channelData?.videos) return [];
-
     const [min, max] = durationRange;
     const filtered = channelData.videos.filter((video) => {
       const durationMinutes = video.durationSeconds / 60;
-
       const isAboveMin = durationMinutes >= min;
       const isBelowMax = max >= 60 ? true : durationMinutes <= max;
-
       return isAboveMin && isBelowMax;
     });
-
     return filtered.sort((a, b) => {
       const dateA = new Date(a.publishedAt);
       const dateB = new Date(b.publishedAt);
-
       if (sortBy === 'oldest') {
         return dateA - dateB;
       }
@@ -140,7 +184,6 @@ export default function ChannelPage() {
         videoId={selectedVideoId}
         onClose={() => setSelectedVideoId(null)}
       />
-
       <AppLayout channelData={channelData}>
         {isLoading && (
           <div className="p-8 flex justify-center items-center h-full">
@@ -161,7 +204,11 @@ export default function ChannelPage() {
           )}
         {!isLoading && !error && channelData?.videos?.length > 0 && (
           <div className="p-4 md:p-8">
-            <ChannelHeader channelInfo={channelData.channelInfo} />
+            <ChannelHeader
+              channelInfo={channelData.channelInfo}
+              isFollowing={isFollowing}
+              onFollowToggle={handleFollowToggle}
+            />
             <FilterControls
               sortBy={sortBy}
               setSortBy={setSortBy}
