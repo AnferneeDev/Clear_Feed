@@ -1,3 +1,5 @@
+// src/app/feed/page.js
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -89,10 +91,8 @@ export default function FeedPage() {
     const [min, max] = durationRange;
     const filtered = feedVideos.filter((video) => {
       const durationMinutes = video.durationSeconds / 60;
-
       const isAboveMin = durationMinutes >= min;
       const isBelowMax = max >= 60 ? true : durationMinutes <= max;
-
       return isAboveMin && isBelowMax;
     });
 
@@ -102,6 +102,9 @@ export default function FeedPage() {
 
       if (sortBy === 'oldest') {
         return dateA - dateB;
+      }
+      if (sortBy === 'popular') {
+        return b.viewCount - a.viewCount;
       }
       return dateB - dateA;
     });
@@ -115,12 +118,10 @@ export default function FeedPage() {
       />
       <AppLayout>
         <div className="p-4 md:p-8">
-          <h1 className="text-3xl font-bold text-[var(--secundarius)] mb-4">
-            My Feed
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground mb-8">My Feed</h1>
 
           {isLoading && (
-            <div className="flex justify-center">
+            <div className="flex justify-center py-20">
               <LoadingSpinner />
             </div>
           )}
@@ -135,7 +136,7 @@ export default function FeedPage() {
                   setSortBy={setSortBy}
                   durationRange={durationRange}
                   setDurationRange={setDurationRange}
-                  showSlicer={true}
+                  showSlider={true}
                 />
                 {filteredAndSortedVideos.length > 0 ? (
                   <FeedGrid
@@ -144,10 +145,10 @@ export default function FeedPage() {
                   />
                 ) : (
                   <div className="text-center py-20">
-                    <h2 className="text-2xl font-bold text-[var(--secundarius)]">
+                    <h2 className="text-2xl font-bold text-foreground">
                       No videos match your filters
                     </h2>
-                    <p className="text-gray-500 mt-2">
+                    <p className="text-muted-foreground mt-2">
                       Try adjusting the duration range.
                     </p>
                   </div>

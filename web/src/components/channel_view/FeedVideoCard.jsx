@@ -1,4 +1,5 @@
 // src/components/channel_view/FeedVideoCard.jsx
+
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,6 +14,18 @@ function formatDuration(durationSeconds) {
     return `${hours}:${paddedMinutes}:${paddedSeconds}`;
   }
   return `${minutes}:${paddedSeconds}`;
+}
+
+// --- ADDED: Helper to format large numbers ---
+function formatNumber(num) {
+  if (!num) return '0';
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(0) + 'K';
+  }
+  return num.toLocaleString();
 }
 
 export function FeedVideoCard({ video, onVideoSelect }) {
@@ -34,7 +47,7 @@ export function FeedVideoCard({ video, onVideoSelect }) {
         </span>
       </div>
       <div className="mt-3 flex gap-3">
-        <Link href={`/channel/${video.channelId}`}>
+        <Link href={`/channel/${video.channelId || video.handle}`}>
           <Image
             src={video.channelThumbnail}
             alt={video.channelTitle}
@@ -45,12 +58,25 @@ export function FeedVideoCard({ video, onVideoSelect }) {
         </Link>
         <div>
           <h3
-            className="font-semibold text-base text-[var(--secundarius)] leading-tight line-clamp-2 group-hover:text-[var(--primarius)] transition-colors"
+            title={video.title}
+            className="font-semibold text-base text-foreground leading-tight line-clamp-2 cursor-pointer group-hover:text-[var(--primarius)] transition-colors"
             onClick={() => onVideoSelect(video.id)}
           >
             {video.title}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">{video.channelTitle}</p>
+          <p className="text-sm text-muted-foreground mt-1 hover:text-foreground transition-colors">
+            {video.channelTitle}
+          </p>
+          {/* --- ADDED: Display view count and date --- */}
+          <p className="text-sm text-muted-foreground mt-1">
+            {formatNumber(video.viewCount)} views
+            <span className="mx-1.5">&middot;</span>
+            {new Date(video.publishedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </p>
         </div>
       </div>
     </div>

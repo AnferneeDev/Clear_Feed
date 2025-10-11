@@ -41,7 +41,7 @@ export async function POST(request) {
         return NextResponse.json(
           {
             message:
-              'Follow limit reached. Upgrade to Pro to follow more channels.',
+              'Follow limit reached. You can only follow 5 channels at the moment.',
           },
           { status: 403 }
         );

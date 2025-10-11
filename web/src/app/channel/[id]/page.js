@@ -161,6 +161,7 @@ export default function ChannelPage() {
 
   const filteredAndSortedVideos = useMemo(() => {
     if (!channelData?.videos) return [];
+
     const [min, max] = durationRange;
     const filtered = channelData.videos.filter((video) => {
       const durationMinutes = video.durationSeconds / 60;
@@ -168,12 +169,19 @@ export default function ChannelPage() {
       const isBelowMax = max >= 60 ? true : durationMinutes <= max;
       return isAboveMin && isBelowMax;
     });
+
     return filtered.sort((a, b) => {
       const dateA = new Date(a.publishedAt);
       const dateB = new Date(b.publishedAt);
+
       if (sortBy === 'oldest') {
         return dateA - dateB;
       }
+      if (sortBy === 'popular') {
+        // Sort by viewCount in descending order for popular
+        return b.viewCount - a.viewCount;
+      }
+      // Default to 'newest'
       return dateB - dateA;
     });
   }, [channelData?.videos, sortBy, durationRange]);

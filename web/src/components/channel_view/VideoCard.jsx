@@ -16,6 +16,17 @@ function formatDuration(durationSeconds) {
   }
 }
 
+function formatNumber(num) {
+  if (!num) return '0';
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(0) + 'K';
+  }
+  return num.toLocaleString();
+}
+
 export function VideoCard({ video, onVideoSelect }) {
   return (
     <div
@@ -39,8 +50,14 @@ export function VideoCard({ video, onVideoSelect }) {
         <h4 className="font-semibold text-base text-[var(--secundarius)] leading-tight line-clamp-3 group-hover:text-[var(--primarius)] transition-colors">
           {video.title}
         </h4>
-        <p className="text-sm text-gray-500 mt-1">
-          {new Date(video.publishedAt).toLocaleDateString('en-CA')}
+        <p className="text-sm text-muted-foreground mt-1">
+          {formatNumber(video.viewCount)} views
+          <span className="mx-1.5">&middot;</span>
+          {new Date(video.publishedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
         </p>
       </div>
     </div>

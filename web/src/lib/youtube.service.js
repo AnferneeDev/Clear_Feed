@@ -60,9 +60,9 @@ export class YouTubeService {
     return data.items?.[0]?.snippet?.channelId || null;
   }
 
-  // --- Helper to resolve any input (URL or handle) to a channel object ---
+  // --- FIX APPLIED HERE: Helper to resolve any input (URL, handle, or Channel ID) to a channel object ---
   static async _getChannelFromIdentifier(identifier) {
-    // --- THIS IS THE CHANGE: Check if it's a YouTube Channel ID first. ---
+    // 1. Check if it's a YouTube Channel ID first.
     // YouTube Channel IDs always start with "UC" and are typically 24 characters long.
     if (identifier.startsWith('UC') && identifier.length >= 24) {
       return this._fetchChannelDetails({ channelId: identifier });
@@ -70,10 +70,11 @@ export class YouTubeService {
 
     let videoId = null;
     try {
+      // 2. Check if it's a YouTube video URL and extract the video ID
       if (identifier.includes('youtube.com/watch')) {
         videoId = new URL(identifier).searchParams.get('v');
       } else if (identifier.includes('youtu.be/')) {
-        videoId = new URL(identifier).pathname.substring(1).split('?')[0];
+        videoId = new URL(identifier).pathname.substring(1).split('?')[0]; // Ensure no query params on youtu.be
       }
     } catch (error) {
       // If URL parsing fails, it's not a valid URL, so treat as a handle
@@ -81,6 +82,7 @@ export class YouTubeService {
     }
 
     if (videoId) {
+      // If a video ID was found, fetch the channel ID from that video
       const channelId = await this._fetchChannelIdFromVideo(videoId);
       if (!channelId) {
         throw new Error(
@@ -89,7 +91,7 @@ export class YouTubeService {
       }
       return this._fetchChannelDetails({ channelId });
     } else {
-      // If it's neither a Channel ID nor a video URL, assume it's a channel handle
+      // 3. If it's neither a Channel ID nor a video URL, assume it's a channel handle
       return this._fetchChannelDetails({ handle: identifier });
     }
   }
@@ -135,19 +137,22 @@ export class YouTubeService {
   }
 
   // --- Private Helper 3: Fetch Durations (with batching) ---
+  // Now also fetches statistics to get viewCount
   static async _fetchVideoDurations(videoItems) {
     const videoIds = videoItems.map((item) => item.snippet.resourceId.videoId);
-    const url = `${this.BASE_URL}/videos?part=contentDetails&id=${videoIds.join(',')}&key=${this.YOUTUBE_API_KEY}`;
+    // --- UPDATED: Requesting 'contentDetails,statistics' to get viewCount ---
+    const url = `${this.BASE_URL}/videos?part=contentDetails,statistics&id=${videoIds.join(',')}&key=${this.YOUTUBE_API_KEY}`;
     const data = await this._fetchJson(url);
 
-    const durationMap = new Map();
+    // Create a map that includes both duration and viewCount
+    const videoDetailsMap = new Map();
     data.items.forEach((item) => {
-      durationMap.set(
-        item.id,
-        parseISO8601Duration(item.contentDetails.duration)
-      );
+      videoDetailsMap.set(item.id, {
+        durationSeconds: parseISO8601Duration(item.contentDetails.duration),
+        viewCount: parseInt(item.statistics.viewCount, 10) || 0, // Store viewCount
+      });
     });
-    return durationMap;
+    return videoDetailsMap;
   }
 
   // --- Mapping Helpers ---
@@ -162,14 +167,21 @@ export class YouTubeService {
     };
   }
 
-  static _mapVideoInfo(item, durationMap) {
+  // --- UPDATED: Map Video Info to include viewCount ---
+  static _mapVideoInfo(item, videoDetailsMap) {
     const videoId = item.snippet.resourceId.videoId;
+    // Get details from the map, ensuring defaults if not found
+    const details = videoDetailsMap.get(videoId) || {
+      durationSeconds: 0,
+      viewCount: 0,
+    };
     return {
       id: videoId,
       title: item.snippet.title,
       thumbnail: item.snippet.thumbnails.high.url,
       publishedAt: item.snippet.publishedAt,
-      durationSeconds: durationMap.get(videoId) || 0,
+      durationSeconds: details.durationSeconds,
+      viewCount: details.viewCount, // Include viewCount here
     };
   }
 
@@ -222,10 +234,10 @@ export class YouTubeService {
       return emptyResponse;
     }
 
-    const durationMap = await this._fetchVideoDurations(videosData.items);
+    const videoDetailsMap = await this._fetchVideoDurations(videosData.items); // Changed name to reflect content
 
     const videos = videosData.items
-      .map((item) => this._mapVideoInfo(item, durationMap))
+      .map((item) => this._mapVideoInfo(item, videoDetailsMap)) // Pass videoDetailsMap
       .filter((video) => video.durationSeconds > 120);
 
     const responseData = {
