@@ -116,7 +116,7 @@ export default function FeedPage() {
       <AppLayout>
         <div className="p-4 md:p-8">
           <h1 className="text-3xl font-bold text-[var(--secundarius)] mb-4">
-            Your Feed
+            My Feed
           </h1>
 
           {isLoading && (

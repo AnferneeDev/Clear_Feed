@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: 'Clear Feed',
-  description: 'Focus on creators, not the algorithm.',
+  description: 'Stop wasting time. Watch only what matters.',
 };
 
 export default function RootLayout({ children }) {

@@ -62,9 +62,9 @@ export default function HeroSection({
               className="py-6 text-base rounded-full sm:flex-grow h-12 bg-gray-300 dark:bg-white dark:text-black border-none focus-visible:ring-0 focus-visible:ring-offset-0" // Transparent with no focus ring
             />
             <RainbowButton
-              type="submit" // --- THE FUNCTIONAL FIX ---
+              type="submit"
               disabled={isLoading}
-              className="mt-2"
+              className="mt-2 min-w-[140px] flex justify-center items-center"
             >
               <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:text-black lg:text-base">
                 {isLoading ? (
