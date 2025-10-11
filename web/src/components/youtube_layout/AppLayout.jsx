@@ -2,7 +2,7 @@
 
 import Sidebar from './AppSidebar'; // CORRECTED
 import { SidebarInset } from '@/components/ui/sidebar';
-import Header from './Header';
+import NavBar from './NavBar';
 import Image from 'next/image';
 
 export default function AppLayout({ children, channelData }) {
@@ -10,7 +10,7 @@ export default function AppLayout({ children, channelData }) {
     <>
       <Sidebar channelData={channelData} /> {/* CORRECTED */}
       <SidebarInset>
-        <Header />
+        <NavBar />
 
         {channelData?.channelInfo?.banner && (
           <div className="relative h-32 md:h-48 w-full">

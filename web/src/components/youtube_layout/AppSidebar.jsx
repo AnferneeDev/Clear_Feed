@@ -36,7 +36,7 @@ export default function AppSidebar() {
 
                   <SidebarMenuButton asChild>
                     <Link href="/feed" className="flex items-center gap-2">
-                      <div className="rounded bg-white">
+                      <div className="rounded-full bg-white">
                         <Image
                           src="/clear_feed.png"
                           alt="Clear Feed logo"

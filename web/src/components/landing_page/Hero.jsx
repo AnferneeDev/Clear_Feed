@@ -58,8 +58,8 @@ export default function HeroSection({
               type="text"
               value={channelUrl}
               onChange={(e) => setChannelUrl(e.target.value)}
-              placeholder="Paste a YouTube channel URL or @handle"
-              className="py-6 text-base sm:flex-grow h-12 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0" // Transparent with no focus ring
+              placeholder="Paste a YouTube channel URL, video URL, or @handle"
+              className="py-6 text-base rounded-full sm:flex-grow h-12 bg-gray-300 dark:bg-white dark:text-black border-none focus-visible:ring-0 focus-visible:ring-offset-0" // Transparent with no focus ring
             />
             <RainbowButton
               type="submit" // --- THE FUNCTIONAL FIX ---
@@ -72,7 +72,7 @@ export default function HeroSection({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   </>
                 ) : (
-                  'Create Feed'
+                  'Search channel'
                 )}
               </span>
             </RainbowButton>
