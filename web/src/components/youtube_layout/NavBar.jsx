@@ -52,8 +52,10 @@ export default function NavBar() {
       </div>
 
       {/* CENTER: 60% of navbar (search occupies this area) */}
+      {/* CENTER: 60% of navbar (search occupies this area) */}
       <div className="basis-[60%] flex items-center justify-center px-4">
         <div className="w-full max-w-full min-w-0">
+          {/* This outer div is for the gradient border animation */}
           <div
             className={cn(
               'relative rounded-full bg-gradient-to-r from-[var(--primarius)] via-purple-500 to-red-500 p-[1px] transition-all duration-300',
@@ -61,6 +63,9 @@ export default function NavBar() {
               isLoading && 'before:w-full'
             )}
           >
+            {/* FIX 1: Add `relative` class here.
+        FIX 2: Move the <button> inside this form.
+      */}
             <form
               id="search-form"
               onSubmit={handleSearch}
@@ -71,25 +76,25 @@ export default function NavBar() {
                 placeholder="Paste a YouTube channel URL, video URL, or @handle"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="py-6 text-base rounded-full bg-transparent border-none sm:ml-2 sm:flex-grow h-12 focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-8 truncate min-w-0"
+                className="py-6 text-base rounded-full bg-transparent border-none sm:ml-2 sm:flex-grow h-12 focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-12 truncate min-w-0" // Increased right padding (pr-12) to make space for the button
               />
+              {/* The button is now INSIDE the form */}
+              <button
+                form="search-form"
+                type="submit"
+                aria-label="Search"
+                disabled={isLoading}
+                className="absolute right-[5px] top-1/2 -translate-y-1/2 h-8 w-10 rounded-full px-2 flex items-center justify-center z-10 bg-transparent border-none"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                ) : (
+                  <Search className="h-5 w-6 text-muted-foreground" />
+                )}
+                <span className="sr-only">Search</span>
+              </button>
             </form>
           </div>
-
-          <button
-            form="search-form"
-            type="submit"
-            aria-label="Search"
-            disabled={isLoading}
-            className="absolute right-[5px] top-1/2 -translate-y-1/2 h-8 w-10 rounded-full px-2 flex items-center justify-center z-10 bg-transparent border-none"
-          >
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : (
-              <Search className="h-5 w-6 text-muted-foreground" />
-            )}
-            <span className="sr-only">Search</span>
-          </button>
         </div>
       </div>
 

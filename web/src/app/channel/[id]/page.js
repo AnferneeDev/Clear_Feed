@@ -38,7 +38,12 @@ export default function ChannelPage() {
     threshold: 0.1,
   });
 
-  const followedChannels = user?.publicMetadata?.followedChannels || [];
+  // Memoize followedChannels to prevent unnecessary recalculations
+  const followedChannels = useMemo(
+    () => user?.publicMetadata?.followedChannels || [],
+    [user?.publicMetadata?.followedChannels]
+  );
+
   const isFollowing = useMemo(
     () =>
       channelData
