@@ -1,9 +1,16 @@
+// src/components/.../ChannelHeader.js
+
+'use client';
+
 import Image from 'next/image';
 import { Check, Plus } from 'lucide-react';
 import { ShinyButton } from '../magicui';
 import { cn } from '@/lib/utils';
+import { useUser, SignInButton } from '@clerk/nextjs'; // Imports for the functionality
 
 export function ChannelHeader({ channelInfo, isFollowing, onFollowToggle }) {
+  const { isSignedIn } = useUser(); // Gets user's sign-in status
+
   if (!channelInfo) return null;
 
   return (
@@ -28,28 +35,43 @@ export function ChannelHeader({ channelInfo, isFollowing, onFollowToggle }) {
       </div>
 
       <div className="sm:ml-auto">
-        <ShinyButton
-          onClick={onFollowToggle}
-          className={cn(isFollowing ? 'bg-gray-200' : 'bg-black')}
-        >
-          <div className="flex items-center gap-2">
-            {isFollowing ? (
-              <>
-                <Check className="h-4 w-4 font-bold text-black dark:text-black" />
-                <span className="text-black font-bold dark:text-black">
-                  Following
-                </span>
-              </>
-            ) : (
-              <>
+        {isSignedIn ? (
+          // RENDER THIS BUTTON IF USER IS SIGNED IN (Your original styles)
+          <ShinyButton
+            onClick={onFollowToggle}
+            className={cn(isFollowing ? 'bg-gray-200' : 'bg-black')}
+          >
+            <div className="flex items-center gap-2">
+              {isFollowing ? (
+                <>
+                  <Check className="h-4 w-4 font-bold text-black dark:text-black" />
+                  <span className="text-black font-bold dark:text-black">
+                    Following
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 font-bold text-white dark:text-white" />
+                  <span className="text-white font-bold dark:text-white">
+                    Follow
+                  </span>
+                </>
+              )}
+            </div>
+          </ShinyButton>
+        ) : (
+          // RENDER THIS BUTTON IF USER IS SIGNED OUT (Styled exactly like your "Follow" button)
+          <SignInButton mode="modal">
+            <ShinyButton className="bg-black">
+              <div className="flex items-center gap-2">
                 <Plus className="h-4 w-4 font-bold text-white dark:text-white" />
                 <span className="text-white font-bold dark:text-white">
                   Follow
                 </span>
-              </>
-            )}
-          </div>
-        </ShinyButton>
+              </div>
+            </ShinyButton>
+          </SignInButton>
+        )}
       </div>
     </div>
   );

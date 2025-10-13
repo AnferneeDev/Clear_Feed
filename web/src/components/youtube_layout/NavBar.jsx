@@ -106,7 +106,7 @@ export default function NavBar() {
           <SignedOut>
             <SignInButton mode="modal">
               {/* THIS IS THE CHANGE: Replaced the standard Button with your ShinyButton */}
-              <ShinyButton className="text-sm font-bold bg-[var(--primarius)] text-foreground whitespace-nowrap">
+              <ShinyButton className="text-sm !font-bold bg-[var(--primarius)] text-foreground whitespace-nowrap">
                 Sign In
               </ShinyButton>
             </SignInButton>
