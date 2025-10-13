@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
+// Removed unused 'Button' import from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import { Search, Loader2, Rss } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -52,7 +52,6 @@ export default function NavBar() {
       </div>
 
       {/* CENTER: 60% of navbar (search occupies this area) */}
-      {/* CENTER: 60% of navbar (search occupies this area) */}
       <div className="basis-[60%] flex items-center justify-center px-4">
         <div className="w-full max-w-full min-w-0">
           {/* This outer div is for the gradient border animation */}
@@ -63,9 +62,6 @@ export default function NavBar() {
               isLoading && 'before:w-full'
             )}
           >
-            {/* FIX 1: Add `relative` class here.
-        FIX 2: Move the <button> inside this form.
-      */}
             <form
               id="search-form"
               onSubmit={handleSearch}
@@ -109,7 +105,10 @@ export default function NavBar() {
 
           <SignedOut>
             <SignInButton mode="modal">
-              <Button size="sm">Sign In</Button>
+              {/* THIS IS THE CHANGE: Replaced the standard Button with your ShinyButton */}
+              <ShinyButton className="text-sm font-bold bg-[var(--primarius)] text-foreground whitespace-nowrap">
+                Sign In
+              </ShinyButton>
             </SignInButton>
           </SignedOut>
           <SignedIn>

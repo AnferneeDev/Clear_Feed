@@ -12,6 +12,7 @@ import {
 } from '@/components/channel_id/index';
 import { FeedVideoCard, FilterControls } from '@/components/channel_view/index';
 import Link from 'next/link';
+import { SignInButton } from '@clerk/nextjs';
 
 function FeedGrid({ videos, onVideoSelect }) {
   return (
@@ -39,12 +40,12 @@ function FeedEmptyState({ isSignedIn }) {
         </p>
       ) : (
         <p className="text-gray-500 mt-2">
-          <Link
-            href="/sign-in"
-            className="text-[var(--primarius)] hover:underline"
-          >
-            Sign in
-          </Link>{' '}
+          {/* THIS IS THE FIX: Replace <Link> with <SignInButton> */}
+          <SignInButton mode="modal">
+            <span className="text-[var(--primarius)] hover:underline cursor-pointer">
+              Sign in
+            </span>
+          </SignInButton>{' '}
           to build a personalized feed.
         </p>
       )}
