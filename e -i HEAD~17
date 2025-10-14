@@ -1,0 +1,32 @@
+[33m3d0d1fa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m style
+[33m67f4169[m fix: feed's sign in button not working properly
+[33m14553f3[m fix:serach icon on top of sign up icon
+[33maa7d35b[m feat: popular filter working
+[33me84a5b2[m feat: add follow feature
+[33mf0f5540[m style: hide my feed button when in taht section
+[33mec8d7dc[m style: navbar
+[33maf2f590[m style: main page
+[33m07d0ac2[m idem
+[33m548391e[m feat: add filters andy feed button
+[33m669971c[m fix: loading from unique identiifier in the sidebar intead of id
+[33m0401bb1[m feat: navbar working in channels now
+[33m1b1c56b[m style(channel header)
+[33m7c19525[m refactor(history): now saves channel unique id from yt intead of using the users URL
+[33m83e272a[m feat: user can input video links now
+[33m56e0f32[m fix: router.js channel history
+[33m98bd1b2[m feat: infinite scroll in channel's page
+[33m49bec8e[m fix: sidebar icons/width
+[33mb3c18bc[m fix: darkmode
+[33m8ee38b0[m fix: darkmode
+[33mbb03eb9[m feat: add darkmode
+[33m92cbb21[m feat: add Feed function
+[33m57dd1e9[m feat: add user.service.js to handle clerk's user logic
+[33m77bc4ef[m refactor: make sidebar handle clerk logic
+[33m84de7cf[m feat: add history feature to side bar
+[33mb0dfb86[m feat: add sidebar from shadcn
+[33m874dd8e[m feat(sidebar and refactor):add sidebar for the channels view plus refactor the entire code into components
+[33mfc4e1a7[m refactor design and logo lading page
+[33md04e161[m refactor: landing page
+[33mabdafd9[m add: configure sentry
+[33m0d2fec2[m feat: install prettier and configure eslint
+[33m48d2ce0[m Apply clean .gitignore and reset tracked files
