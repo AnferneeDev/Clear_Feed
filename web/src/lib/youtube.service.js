@@ -69,12 +69,17 @@ export class YouTubeService {
     }
 
     let videoId = null;
+    let channelHandle = null;
     try {
-      // 2. Check if it's a YouTube video URL and extract the video ID
+      // 2. Check if it's a YouTube URL
       if (identifier.includes('youtube.com/watch')) {
         videoId = new URL(identifier).searchParams.get('v');
       } else if (identifier.includes('youtu.be/')) {
         videoId = new URL(identifier).pathname.substring(1).split('?')[0]; // Ensure no query params on youtu.be
+      } else if (identifier.includes('youtube.com/@')) {
+        // Extract handle from URL like https://www.youtube.com/@TheBongo-
+        const url = new URL(identifier);
+        channelHandle = url.pathname.split('/')[1]; // Gets '@TheBongo-'
       }
     } catch (error) {
       // If URL parsing fails, it's not a valid URL, so treat as a handle
@@ -90,8 +95,11 @@ export class YouTubeService {
         );
       }
       return this._fetchChannelDetails({ channelId });
+    } else if (channelHandle) {
+      // If a channel handle was extracted from URL, use it
+      return this._fetchChannelDetails({ handle: channelHandle });
     } else {
-      // 3. If it's neither a Channel ID nor a video URL, assume it's a channel handle
+      // 3. If it's neither a Channel ID nor a video URL nor a channel URL, assume it's a channel handle
       return this._fetchChannelDetails({ handle: identifier });
     }
   }

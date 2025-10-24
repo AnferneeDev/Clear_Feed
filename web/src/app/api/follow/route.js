@@ -37,11 +37,11 @@ export async function POST(request) {
       action = 'unfollowed';
     } else {
       // FOLLOW LOGIC: Add the channel, but check the limit first
-      if (followedChannels.length >= 5) {
+      if (followedChannels.length >= 7) {
         return NextResponse.json(
           {
             message:
-              'Follow limit reached. You can only follow 5 channels at the moment.',
+              'Follow limit reached. You can only follow 7 channels at the moment.',
           },
           { status: 403 }
         );
