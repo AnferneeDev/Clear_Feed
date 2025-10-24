@@ -11,7 +11,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)
-![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)
 
 </div>
 
@@ -160,21 +160,13 @@ For more details, see the Next.js deployment docs: https://nextjs.org/docs/deplo
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+PROPRIETARY LICENSE
 
-You are free to:
+Copyright (c) 2025 Anfernee Pichardo All rights reserved.
 
-- Share — copy and redistribute the material in any medium or format.
+This software is confidential and proprietary. No part of this software may be copied, reproduced, modified, distributed, or used in any way without the express written permission of Anfernee Pichardo.
 
-- Adapt — remix, transform, and build upon the material.
-
-Under the following terms:
-
-- Attribution — give appropriate credit.
-
-- NonCommercial — you may not use the material for commercial purposes.
-
-- ShareAlike — distribute contributions under the same license.
+See the LICENSE file for more details.
 
 ---
 
