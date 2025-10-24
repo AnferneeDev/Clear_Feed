@@ -94,41 +94,62 @@ To add your GIF:
 
 # Clone the repository
 
-git clone https://github.com/AnferneeDev/Clear_Feed.git
+` git clone https://github.com/AnferneeDev/Clear_Feed.git`
 
 # Navigate to the project directory
 
-cd Clear_Feed/web
+` cd Clear_Feed/web`
 
 # Install dependencies
 
-npm install
+`npm install`
 
 ## Environment Variables
 
+```
 Create a `.env.local` file in the `web` directory and add:
+
+
 
 # YouTube API (Google Cloud Console, YouTube Data API v3 enabled)
 
+
+
 YOUTUBE_API_KEY="YOUR_YOUTUBE_API_KEY"
+
+
 
 # Upstash Redis
 
+
+
 UPSTASH_REDIS_REST_URL="YOUR_UPSTASH_URL"
+
 UPSTASH_REDIS_REST_TOKEN="YOUR_UPSTASH_TOKEN"
+
+
 
 # Clerk
 
+
+
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="YOUR_CLERK_PUBLISHABLE_KEY"
+
 CLERK_SECRET_KEY="YOUR_CLERK_SECRET_KEY"
+
+
 
 # Optional: Sentry DSN
 
+
+
 SENTRY_DSN="YOUR_SENTRY_DSN"
+```
 
 ## Run Development Server
 
-npm run dev
+`npm run dev`
+
 Open http://localhost:3000 in your browser.
 
 ---
@@ -137,7 +158,8 @@ Open http://localhost:3000 in your browser.
 
 This project is configured for seamless deployment on Vercel.
 
-When deploying, remember to add your environment variables in the Vercel project settings.  
+When deploying, remember to add your environment variables in the Vercel project settings.
+
 For more details, see the Next.js deployment docs: https://nextjs.org/docs/deployment
 
 ---
@@ -149,21 +171,23 @@ This project is licensed under the Creative Commons Attribution-NonCommercial-Sh
 You are free to:
 
 - Share — copy and redistribute the material in any medium or format.
+
 - Adapt — remix, transform, and build upon the material.
 
 Under the following terms:
 
 - Attribution — give appropriate credit.
-- NonCommercial — you may not use the material for commercial purposes.
-- ShareAlike — distribute contributions under the same license.
 
-Add a LICENSE.txt file with the full license text for compliance.
+- NonCommercial — you may not use the material for commercial purposes.
+
+- ShareAlike — distribute contributions under the same license.
 
 ---
 
 ## Contact
 
-**Anfernee Pichardo**  
+**Anfernee Pichardo**
+
 [LinkedIn](https://www.linkedin.com/in/anfernee-pichardo-0787a637a/) • your.email@example.com
 
 Project Link: [https://github.com/AnferneeDev/Clear_Feed](https://github.com/AnferneeDev/Clear_Feed)
