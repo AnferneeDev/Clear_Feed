@@ -52,6 +52,8 @@ It allows users to watch content from their favorite channels without recommenda
 - No Recommendations: Break the cycle of endless consumption by removing "recommended for you" videos.
 - High-Performance Caching: Uses Redis (Upstash) for blazing-fast performance and efficient API quota management.
 - Production-Ready: Includes error tracking with Sentry and a modular architecture for maintainability.
+- Personalized Channel Feed: Log in and follow your favorite channels to see a unified feed.
+- Flexible Filters: Sort by popular, newest, oldest, or filter by video duration.
 
 ---
 
@@ -60,14 +62,6 @@ It allows users to watch content from their favorite channels without recommenda
 Check out the live website: [clear-feed.vercel.app](https://clear-feed.vercel.app)
 
 ![App Demo](assets/images/demo.gif)
-
-To add your GIF:
-
-1. Create a folder in your repo: `assets/images/`
-2. Place your GIF inside it (e.g., `demo.gif`).
-3. GitHub will render it automatically with the line above.
-
----
 
 ## Tech Stack
 
@@ -188,6 +182,6 @@ Under the following terms:
 
 **Anfernee Pichardo**
 
-[LinkedIn](https://www.linkedin.com/in/anfernee-pichardo-0787a637a/) • your.email@example.com
+[LinkedIn](https://www.linkedin.com/in/anfernee-pichardo-0787a637a/) • anfernee.developer@gmail.com
 
 Project Link: [https://github.com/AnferneeDev/Clear_Feed](https://github.com/AnferneeDev/Clear_Feed)

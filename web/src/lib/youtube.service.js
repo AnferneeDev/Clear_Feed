@@ -31,25 +31,124 @@ export class YouTubeService {
   }
 
   // --- Helper to find a channel by EITHER handle or ID ---
-  static async _fetchChannelDetails({ handle, channelId }) {
-    let url;
-    if (handle) {
-      const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
-      url = `${this.BASE_URL}/channels?part=snippet,contentDetails,statistics,brandingSettings&forHandle=${cleanHandle}&key=${this.YOUTUBE_API_KEY}`;
-    } else if (channelId) {
-      url = `${this.BASE_URL}/channels?part=snippet,contentDetails,statistics,brandingSettings&id=${channelId}&key=${this.YOUTUBE_API_KEY}`;
-    } else {
-      return null;
-    }
+  static async _fetchVideoDetails(videoId) {
+    const url = `${this.BASE_URL}/videos?part=snippet&id=${videoId}&key=${this.YOUTUBE_API_KEY}`;
     console.log(
-      '[YouTube API] Fetching channel URL:',
+      '[YouTube API] Fetching video details:',
       url.replace(this.YOUTUBE_API_KEY, 'API_KEY')
     );
     const data = await this._fetchJson(url);
+    return data.items?.[0] || null;
+  }
+
+  // REPLACE the existing _fetchChannelDetails with this new version
+  static async _fetchChannelDetails({ handle, channelId }) {
+    let url;
+    let data;
+    let videoId = null;
+    let cleanName = null;
+
+    // --- 0. Check what 'handle' contains ---
+    if (handle) {
+      try {
+        // It's a full URL
+        const urlObj = new URL(handle);
+        const hostname = urlObj.hostname;
+        const pathname = urlObj.pathname;
+
+        if (hostname.includes('youtube.com')) {
+          if (pathname === '/watch') {
+            // Case 1: Video URL (e.g., /watch?v=kttBGYwfiGM)
+            videoId = urlObj.searchParams.get('v');
+          } else if (pathname.startsWith('/@')) {
+            // Case 2: Channel Handle URL (e.g., /@handle)
+            cleanName = pathname.substring(1); // will be "@handle"
+          } else if (pathname.startsWith('/c/')) {
+            // Case 3: Legacy Channel URL (e.g., /c/username)
+            cleanName = pathname.substring(3);
+          } else if (pathname.startsWith('/user/')) {
+            // Case 4: Legacy Channel URL (e.g., /user/username)
+            cleanName = pathname.substring(6);
+          } else if (
+            pathname.length > 1 &&
+            !pathname.includes('/', 1) &&
+            !pathname.startsWith('/shorts/')
+          ) {
+            // Case 5: Root path URL (e.g., /JavaScriptMastery)
+            // Added check for /shorts/ which is a video
+            cleanName = pathname.substring(1);
+          }
+        } else if (hostname.includes('youtu.be')) {
+          // Case 6: Short Video URL (e.g., youtu.be/kttBGYwfiGM)
+          videoId = pathname.substring(1);
+        }
+      } catch (e) {
+        // Not a URL, assume it's a raw handle/username
+        // Case 7: Raw handle/username (e.g., "JavaScriptMastery" or "@handle")
+        cleanName = handle;
+      }
+    }
+
+    // --- 1. Handle Video URL case ---
+    if (videoId) {
+      console.log(`[YouTube API] Extracted Video ID: ${videoId}`);
+      const videoDetails = await this._fetchVideoDetails(videoId);
+      if (videoDetails && videoDetails.snippet) {
+        channelId = videoDetails.snippet.channelId; // This sets channelId for the next block
+        console.log(`[YouTube API] Found Channel ID from video: ${channelId}`);
+      } else {
+        console.log('[YouTube API] Could not find video details.');
+        return null; // Video not found
+      }
+    }
+
+    // --- 2. Handle Channel ID case ---
+    if (channelId) {
+      // This block will run if channelId was passed directly OR extracted from a video
+      url = `${this.BASE_URL}/channels?part=snippet,contentDetails,statistics,brandingSettings&id=${channelId}&key=${this.YOUTUBE_API_KEY}`;
+      console.log(
+        '[YouTube API] Fetching channel by ID:',
+        url.replace(this.YOUTUBE_API_KEY, 'API_KEY')
+      );
+      data = await this._fetchJson(url);
+    } else if (cleanName) {
+      // --- 3. Handle Handle/Username case ---
+      // Clean the name (remove @ if it exists)
+      const finalName = cleanName.startsWith('@')
+        ? cleanName.substring(1)
+        : cleanName;
+
+      // Try fetching by handle first
+      url = `${this.BASE_URL}/channels?part=snippet,contentDetails,statistics,brandingSettings&forHandle=${finalName}&key=${this.YOUTUBE_API_KEY}`;
+      console.log(
+        '[YouTube API] Fetching channel by handle:',
+        url.replace(this.YOUTUBE_API_KEY, 'API_KEY')
+      );
+      data = await this._fetchJson(url);
+
+      // If not found, try fetching by legacy username
+      if (!data.items || data.items.length === 0) {
+        console.log(
+          '[YouTube API] Handle not found, trying legacy username...'
+        );
+        url = `${this.BASE_URL}/channels?part=snippet,contentDetails,statistics,brandingSettings&forUsername=${finalName}&key=${this.YOUTUBE_API_KEY}`;
+        console.log(
+          '[YouTube API] Fetching channel by username:',
+          url.replace(this.YOUTUBE_API_KEY, 'API_KEY')
+        );
+        data = await this._fetchJson(url);
+      }
+    } else {
+      // No valid input
+      return null;
+    }
+
+    // --- 4. Process the final result ---
     console.log(
       '[YouTube API] Raw Channel response:',
       JSON.stringify(data, null, 2)
     );
+
     return data.items?.[0] || null;
   }
 
