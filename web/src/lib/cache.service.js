@@ -9,7 +9,9 @@ class CacheService {
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
     if (!redisUrl || !redisToken) {
-      throw new Error(CREDENTIALS_ERROR_MESSAGE);
+      console.warn(CREDENTIALS_ERROR_MESSAGE);
+      this.redis = null;
+      return;
     }
 
     this.redis = new Redis({
@@ -19,6 +21,7 @@ class CacheService {
   }
 
   async get(key) {
+    if (!this.redis) return null;
     try {
       const data = await this.redis.get(key);
       console.log('/**********************/');
@@ -36,6 +39,7 @@ class CacheService {
   }
 
   async set(key, value) {
+    if (!this.redis) return;
     try {
       const CACHE_DURATION_SECONDS = 60 * 60 * 24; // 10 minutes
       await this.redis.set(key, value, { ex: CACHE_DURATION_SECONDS });

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import ClientDate from '@/components/ClientDate';
 
 function formatDuration(durationSeconds) {
   if (durationSeconds == null || durationSeconds === 0) return '0:00';
@@ -53,11 +54,14 @@ export function VideoCard({ video, onVideoSelect }) {
         <p className="text-sm text-muted-foreground mt-1">
           {formatNumber(video.viewCount)} views
           <span className="mx-1.5">&middot;</span>
-          {new Date(video.publishedAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
+          <ClientDate
+            date={video.publishedAt}
+            options={{
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            }}
+          />
         </p>
       </div>
     </div>
